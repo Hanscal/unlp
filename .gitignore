@@ -1,0 +1,8 @@
+*.idea
+*.pyc
+*__pycache__
+*build
+*dist
+unlp.egg-info
+unlp/transformers
+unlp/taskflow
