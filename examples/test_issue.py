@@ -6,7 +6,7 @@
 import sys
 import unittest
 
-sys.path.append('../Word2Vec')
+sys.path.append('../unlp/unsupervised/Word2Vec')
 
 from Text2Vec import SBert, cos_sim
 from Text2Vec import BM25

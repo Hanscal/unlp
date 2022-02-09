@@ -7,7 +7,7 @@
 import sys
 import unittest
 
-sys.path.append('../Word2Vec')
+sys.path.append('../unlp/unsupervised/Word2Vec')
 from Text2Vec import Word2Vec
 import numpy as np
 

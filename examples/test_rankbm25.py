@@ -6,7 +6,7 @@
 import sys
 import unittest
 
-sys.path.append('../Word2Vec')
+sys.path.append('../unlp/unsupervised/Word2Vec')
 from Text2Vec.utils.rank_bm25 import BM25Okapi
 from Text2Vec.utils.tokenizer import segment
 

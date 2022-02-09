@@ -7,7 +7,6 @@
 @Email   : hua.cai@unidt.com
 """
 import numpy as np
-import textembedding
 
 def get_similarity(query_vec, vec_list, sent, sent_list, metric_type='cos'):
     similarity = None
@@ -42,7 +41,7 @@ if __name__ == '__main__':
     from unlp import UkeywordsExtract, USemanticSearch, UTextEmbedding, UTextSimilarity
 
     s = UTextSimilarity(
-        model_path='/Volumes/work/project/unlp/unlp/transformers/paraphrase-multilingual-MiniLM-L12-v2',
+        model_path='/unlp/transformers/paraphrase-multilingual-MiniLM-L12-v2',
         model_type='sentbert')
     a = "第一条  为规范企业国有产权转让行为，推动国有资产存量的合理流动，防止国有资产流失，根据国家有关法律、法规的规定，制定本办法。"
     b = '''该研究主持者之一、波士顿大学地球与环境科学系博士陈池（音）表示，“尽管中国和印度国土面积仅占全球陆地的9%，但两国为这一绿化过程贡献超过三分之一。考虑到人口过多的国家一般存在对土地过度利用的问题，这个发现令人吃惊。”
