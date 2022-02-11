@@ -150,7 +150,7 @@ class Word2Vec(object):
             if count > 0:
                 avg_tensor_x = np.divide(tensor_x, count)
             else:
-                avg_tensor_x = np.zeros(dims)
+                avg_tensor_x = np.zeros(dims, dtype=np.float32)
             all_embeddings.append(avg_tensor_x)
         all_embeddings = np.array(all_embeddings)
         if input_is_string:

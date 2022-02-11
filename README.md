@@ -40,7 +40,7 @@ keywords = model.run(text)  # text为list, 支持批量抽取
 ```py
 from unlp import UTextEmbedding
 model = UTextEmbedding(modelpath, model_type)
-keywords = model.run(text)  # text为list, 支持批量文本嵌入向量
+embeddings = model.run(text)  # text为list, 支持批量文本嵌入向量
 ```
 
 ### 3. 获得文本相似度  
@@ -52,7 +52,7 @@ keywords = model.run(text)  # text为list, 支持批量文本嵌入向量
 ```py
 from unlp import UTextSimilarity
 model = UTextSimilarity(modelpath, model_type)
-keywords = model.run(texta, textb)  # texta和textb为str, 实现文本语义相似度计算
+similarity = model.run(texta, textb)  # texta和textb为str, 实现文本语义相似度计算
 ```
 
 ### 4. 文本语义检索  
@@ -66,7 +66,7 @@ keywords = model.run(texta, textb)  # texta和textb为str, 实现文本语义相
 ```py
 from unlp import USemanticSearch
 model = USemanticSearch(modelpath, model_type, corpus)
-keywords = model.run(queries, top_k)  # queries为list, 实现批量文本语义搜索
+retrieves = model.run(queries, top_k)  # queries为list, 实现批量文本语义搜索
 ```
 
 ## TODO 监督学习方法

@@ -1,0 +1,5 @@
+jieba
+numpy
+gensim
+transformers>=4.15.0
+sentence-transformers==2.0.0

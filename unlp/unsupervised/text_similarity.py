@@ -18,17 +18,17 @@ from mutils.tokenizer import Tokenizer
 from mutils.similarity import cos_sim
 
 class Similarity(object):    
-    def __init__(self, model_path='',embedding_type='sentbert', similarity_type='cosine', **kwargs):
-        if embedding_type == 'sentbert':
+    def __init__(self, model_path='',model_type='sentbert', similarity_type='cosine', **kwargs):
+        if model_type == 'sentbert':
             self.model = SentBERT(model_path) if os.path.exists(model_path) else SentBERT()
-        elif embedding_type == 'w2v':
+        elif model_type == 'w2v':
             w2v_kwargs = {'binary':True}
             w2v_kwargs.update(kwargs)
             self.model = Word2Vec(model_name_or_path=model_path, w2v_kwargs=w2v_kwargs) if os.path.exists(model_path) else Word2Vec(w2v_kwargs=kwargs)
         else:
             print("suport embedding_type: {}".format("##".join(['sentbert','w2v'])))
             os._exit(-1)
-        if similarity_type == 'wmd' and embedding_type != 'w2v':
+        if similarity_type == 'wmd' and model_type != 'w2v':
             print("{} and {} should exist at the same time!".format(similarity_type, 'w2v'))
             os._exit(-1)
         self.similarity_type = similarity_type
