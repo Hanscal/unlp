@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="unlp",
-    version="1.1.0",
+    version="1.2.0",
     author="hanscal",
     author_email="hanscalcai@163.com",
     description="a library that get text embeddings",
