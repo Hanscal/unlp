@@ -9,6 +9,8 @@
 import os
 import unlp.taskflow
 from unlp import unsupervised
+from unlp import supervised
+from unlp.supervised import ClassificationDataFormat
 
 
 name = "unlp"
@@ -71,3 +73,21 @@ class USemanticSearch(object):
         res = self.model.run_search(query, top_k)
         return res
 
+
+# 有监督模型进行文本分类
+class STextClassification(object):
+    def __init__(self, model_path, model_type, mode, datadir='../supervised/classification/data/THUCNews', **kwargs):
+        model_types = ['DPCNN', "FastText", "TextCNN", "TextRCNN", "TextRNN", "TextRNN_Att", "BERT", "ERNIE"]
+        if model_type not in model_types:
+             print("suport model_type: {}".format("##".join(model_types)))
+             os._exit(-1)
+        if not model_path and model_type in ['BERT', "ERNIE"]:
+            print('model download automatically!')
+        self.model = supervised.text_classify.Classification(model_type, mode=mode, **{"use_word":False, "embedding": "random",
+                                                                              "dataset": datadir,
+                                                                              "model_path": model_path,
+                                                                              "pretrain_model_path": kwargs["pretrain_model_path"],
+                                                                              "text": kwargs.get('text',[])})
+    def run(self):
+        res = self.model.run()
+        return res

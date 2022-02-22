@@ -71,6 +71,22 @@ retrieves = model.run(queries, top_k)  # queries为list, 实现批量文本语�
 
 ## TODO 监督学习方法
 ### 1. 文本分类  
+**model：通过model_path和model_type来制定模型**  
+  model_path可以为相应的model权重，如果为''，则会自动下载model权重；  
+  model_type目前支持['DPCNN', "FastText", "TextCNN", "TextRCNN", "TextRNN", "TextRNN_Att", "BERT", "ERNIE"]  
+  mode为模型的三种模式：['train', "evaluate", "predict"]，分别对应于训练，评估和预测。
+  datadir为模型的输入数据，格式可以通过这个命令查看：  
+```py
+from unlp import ClassificationDataFormat
+```
+**kwargs：额外需要传入的参数**  
+如果是预测**kwargs是{"text":List[str]}这样的格式；   
+
+```py
+from unlp import STextClassification
+model = STextClassification(model_path, model_type, mode, datadir, **kwargs)
+res = model.run()  # 实现模型的训练，评估和预测
+```
 
 ### 2. 序列标注  
 

@@ -182,8 +182,7 @@ def _extract_archive(file_path, path='.', archive_format='auto'):
 
 
 def get_file(
-        fname: str = None,
-        origin: str = None,
+        origin: list = None,
         untar: bool = False,
         extract: bool = False,
         md5_hash: typing.Any = None,
@@ -193,7 +192,7 @@ def get_file(
         cache_subdir: typing.Union[Path, str] = 'data',
         cache_dir: typing.Union[Path, str] = 'dataset',
         verbose: int = 1
-) -> str:
+) -> list:
     """
     Downloads a file from a URL if it not already in the cache.
 
@@ -206,8 +205,6 @@ def get_file(
     Passing a hash will verify the file after download. The command line
     programs `shasum` and `sha256sum` can compute the hash.
 
-    :param fname: Name of the file. If an absolute path `/path/to/file.txt` is
-        specified the file will be saved at that location.
     :param origin: Original URL of the file.
     :param untar: Deprecated in favor of 'extract'. Boolean, whether the file
         should be decompressed.
@@ -238,68 +235,73 @@ def get_file(
         file_hash = md5_hash
         hash_algorithm = 'md5'
     datadir_base = os.path.expanduser(cache_dir)
-    if not os.access(datadir_base, os.W_OK):
-        datadir_base = os.path.join('/tmp', '.text2vec')
+    # if not os.access(datadir_base, os.W_OK):
+    #     datadir_base = os.path.join('/tmp', '.bert')
     datadir = os.path.join(datadir_base, cache_subdir)
     if not os.path.exists(datadir):
         os.makedirs(datadir)
 
-    if untar:
-        untar_fpath = os.path.join(datadir, fname)
-        fpath = untar_fpath + '.tar.gz'
-    else:
-        fpath = os.path.join(datadir, fname)
+    file_name_list = [f.rsplit('/', maxsplit=1)[-1] for f in origin]
+    fpath_list = []
+    for fname, url in zip(file_name_list,origin):
+        if untar:
+            untar_fpath = os.path.join(datadir, fname)
+            fpath = untar_fpath + '.tar.gz'
+        else:
+            fpath = os.path.join(datadir, fname)
 
-    download = False
-    if os.path.exists(fpath):
-        if file_hash is not None:
-            if not validate_file(fpath, file_hash, algorithm=hash_algorithm):
-                print('A local file was found, but it seems to be '
-                      'incomplete or outdated because the file hash '
-                      'does not match the original value of file_hash.'
-                      ' We will re-download the data.')
-                download = True
-    else:
-        download = True
+        fpath_list.append(fpath)
+        download = False
+        if os.path.exists(fpath):
+            if file_hash is not None:
+                if not validate_file(fpath, file_hash, algorithm=hash_algorithm):
+                    print('A local file was found, but it seems to be '
+                          'incomplete or outdated because the file hash '
+                          'does not match the original value of file_hash.'
+                          ' We will re-download the data.')
+                    download = True
+        else:
+            download = True
 
-    if download:
-        print('Downloading data from', origin)
+        if download:
+            print('Downloading data from', url)
 
-        class ProgressTracker(object):
-            progbar = None
+            class ProgressTracker(object):
+                progbar = None
 
-        def dl_progress(count, block_size, total_size):
-            if ProgressTracker.progbar is None:
-                if total_size == -1:
-                    total_size = None
-                ProgressTracker.progbar = Progbar(
-                    target=total_size, verbose=verbose)
-            else:
-                ProgressTracker.progbar.update(count * block_size)
+            def dl_progress(count, block_size, total_size):
+                if ProgressTracker.progbar is None:
+                    if total_size == -1:
+                        total_size = None
+                    ProgressTracker.progbar = Progbar(
+                        target=total_size, verbose=verbose)
+                else:
+                    ProgressTracker.progbar.update(count * block_size)
 
-        error_msg = 'URL fetch failure on {} : {} -- {}'
-        try:
+            error_msg = 'URL fetch failure on {} : {} -- {}'
             try:
-                urlretrieve(origin, fpath, dl_progress)
-            except HTTPError as e:
-                raise Exception(error_msg.format(origin, e.code, e.msg))
-            except URLError as e:
-                raise Exception(error_msg.format(origin, e.errno, e.reason))
-        except (Exception, KeyboardInterrupt):
-            if os.path.exists(fpath):
-                os.remove(fpath)
-            raise
-        ProgressTracker.progbar = None
+                try:
+                    urlretrieve(url, fpath, dl_progress)
+                except HTTPError as e:
+                    raise Exception(error_msg.format(origin, e.code, e.msg))
+                except URLError as e:
+                    raise Exception(error_msg.format(origin, e.errno, e.reason))
+            except (Exception, KeyboardInterrupt):
+                if os.path.exists(fpath):
+                    os.remove(fpath)
+                raise
+            ProgressTracker.progbar = None
 
-    if untar:
-        if not os.path.exists(untar_fpath):
-            _extract_archive(fpath, datadir, archive_format='tar')
-        return untar_fpath
+        if untar:
+            if not os.path.exists(untar_fpath):
+                os.makedirs(untar_fpath)
+                _extract_archive(fpath, untar_fpath, archive_format='tar')
+            return untar_fpath
 
-    if extract:
-        _extract_archive(fpath, datadir, archive_format)
+        if extract:
+            _extract_archive(fpath, cache_dir, archive_format)
 
-    return fpath
+    return fpath_list
 
 
 def validate_file(fpath, file_hash, algorithm='auto', chunk_size=65535):

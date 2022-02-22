@@ -13,6 +13,7 @@ import jieba
 import jieba.posseg
 from collections import OrderedDict
 import heapq
+import operator
 
 # 装载LAC模型
 # PER	人名	LOC	地名	ORG	机构名	TIME	时间
@@ -125,7 +126,7 @@ class TFIDF(KeywordExtractor):
 
         if withWeight:
             # 修改返回topk个关键字，但是不改变关键字在文中的位置
-            tags = sorted(freq.items(), key=itemgetter(1), reverse=True)
+            tags = sorted(freq.items(), key=operator.itemgetter(1), reverse=True)
             tags = tags[:topK]
             # tags = list(freq)
         else:

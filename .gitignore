@@ -6,3 +6,5 @@
 unlp.egg-info
 unlp/transformers
 unlp/taskflow
+unlp/supervised/*/data/*/log
+unlp/supervised/*/data/*/saved_dict
