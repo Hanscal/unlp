@@ -18,6 +18,8 @@ from tensorboardX import SummaryWriter
 sys.path.append(os.path.dirname(__file__))
 from evaluate import Evaluate
 
+WEIGHTS_NAME = 'pytorch_model.bin'
+
 class Train(object):
     def __init__(self):
         self.eval = Evaluate()
@@ -51,7 +53,11 @@ class Train(object):
                     dev_acc, dev_loss = self.eval.evaluate(config, model, dev_iter)
                     if dev_loss < dev_best_loss:
                         dev_best_loss = dev_loss
-                        torch.save(model.state_dict(), config.save_path)
+                        save_path = config.save_path
+                        if config.model_name in ["BERT", "ERNIE"]:
+                            # If we save using the predefined names, we can load using `from_pretrained`
+                            save_path = os.path.join(config.save_path, WEIGHTS_NAME)
+                        torch.save(model.state_dict(), save_path)
                         improve = '*'
                         last_improve = total_batch
                     else:
@@ -133,7 +139,11 @@ class TrainTransfomer(object):
                     dev_acc, dev_loss = self.eval.evaluate(config, model, dev_iter)
                     if dev_loss < dev_best_loss:
                         dev_best_loss = dev_loss
-                        torch.save(model.state_dict(), config.save_path)
+                        save_path = config.save_path
+                        if config.model_name in ["BERT", "ERNIE"]:
+                            # If we save using the predefined names, we can load using `from_pretrained`
+                            save_path = os.path.join(config.save_path, WEIGHTS_NAME)
+                        torch.save(model.state_dict(), save_path)
                         improve = '*'
                         last_improve = total_batch
                     else:
