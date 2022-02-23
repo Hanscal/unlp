@@ -22,6 +22,8 @@ from predict import Predict
 from sutils.dutils import init_network
 from sutils.dutils import load_vocab
 
+WEIGHTS_NAME = 'pytorch_model.bin'
+
 class Service(object):
     def __init__(self, model_name, mode, use_word=False, **kwargs):
         np.random.seed(1)
@@ -58,15 +60,22 @@ class Service(object):
             self.config.n_vocab = len(self.vocab)
             self.model = self.x.Model(self.config).to(self.config.device)
             resume_model_path = kwargs.get('model_path', '')
-            if os.path.exists(resume_model_path):
+            if os.path.isdir(resume_model_path) and kwargs.get('resume',''):
+                resume_model_path = os.path.join(resume_model_path, WEIGHTS_NAME)
                 print("resume model from {}".format(resume_model_path))
                 self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
+            elif os.path.isfile(resume_model_path) and kwargs.get('resume'):
+                print("resume model from {}".format(resume_model_path))
+                self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
+
         elif mode == 'evaluate':
             self.config = self.x.Config(dataset, embedding, **kwargs)
             self.vocab = load_vocab(self.config, use_word=self.use_word)
             self.config.n_vocab = len(self.vocab)
             self.model = self.x.Model(self.config).to(self.config.device)
             model_path = kwargs['model_path']
+            if os.path.isdir(model_path):
+                model_path = os.path.join(model_path, WEIGHTS_NAME)
             print("loading model from {}".format(model_path))
             self.model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         elif mode == 'predict':
@@ -79,6 +88,8 @@ class Service(object):
                 print('no vocab path in config, model name:{}'.format(self.config.model_name))
             model_path = kwargs['model_path']
             self.model = self.x.Model(self.config).to(self.config.device)
+            if os.path.isdir(model_path):
+                model_path = os.path.join(model_path, WEIGHTS_NAME)
             print("loading model from {}".format(model_path))
             self.model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 
@@ -123,12 +134,13 @@ if __name__ == '__main__':
     # res = service.run_predict(text=['艺龙网并购两家旅游网站'], model_path='./data/THUCNews/saved_dict/DPCNN.ckpt', embedding="random")
 
     # train-BERT
-    # service = Service(model_name="BERT", mode='train', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-    #                                                       "model_name":"/Volumes/work/project/unlp/unlp/transformers/bert-base-chinese"})
-    # res = service.run_train()
+    service = Service(model_name="ERNIE", mode='train', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
+                                                          "model_path":"/Volumes/work/project/unlp/unlp/transformers/ernie-1.0",
+                                                          "resume":False})
+    res = service.run_train()
     # predict-BERT
-    service = Service(model_name="BERT", mode='predict', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-                                                            "pretrain_model_path":"/Volumes/work/project/unlp/unlp/transformers/bert-base-chinese",
-                                                            "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT.ckpt"})
-    res = service.run_predict(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势"])
-    print(res)
+    # service = Service(model_name="BERT", mode='predict', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
+    #                                                         "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT",
+    #                                                         "resume":True})
+    # res = service.run_predict(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势"])
+    # print(res)

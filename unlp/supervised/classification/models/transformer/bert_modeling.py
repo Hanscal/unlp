@@ -527,6 +527,23 @@ class BertPreTrainedModel(nn.Module):
         if isinstance(module, nn.Linear) and module.bias is not None:
             module.bias.data.zero_()
 
+    def save_pretrained(self, save_directory):
+        """ Save a model and its configuration file to a directory, so that it
+            can be re-loaded using the `:func:`BertPreTrainedModel.from_pretrained`` class method.
+        """
+        assert os.path.isdir(save_directory), "Saving path should be a directory where the model and configuration can be saved"
+
+        # Only save the model it-self if we are using distributed training
+        model_to_save = self.module if hasattr(self, 'module') else self
+
+        # Save configuration file, 在模型初始化的时候已经保存了
+        # self.config.to_json_file(os.path.join(save_directory, CONFIG_NAME))
+
+        # If we save using the predefined names, we can load using `from_pretrained`
+        output_model_file = os.path.join(save_directory, WEIGHTS_NAME)
+        torch.save(model_to_save.state_dict(), output_model_file)
+        logger.info("Model weights saved in {}".format(output_model_file))
+
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path, *inputs, **kwargs):
         """
