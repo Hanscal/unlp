@@ -77,7 +77,7 @@ class USemanticSearch(object):
 
 # 有监督模型进行文本分类
 class STextClassification(object):
-    def __init__(self, model_path, model_type, mode, datadir='../supervised/classification/data/THUCNews', **kwargs):
+    def __init__(self, model_path, model_type, mode, datadir='../supervised/classification/data/THUCNews'):
         model_types = ['DPCNN', "FastText", "TextCNN", "TextRCNN", "TextRNN", "TextRNN_Att", "BERT", "ERNIE"]
         if model_type not in model_types:
              print("suport model_type: {}".format("##".join(model_types)))
@@ -86,8 +86,22 @@ class STextClassification(object):
             print('model download automatically!')
         self.model = supervised.text_classify.Classification(model_type, mode=mode, **{"use_word":False, "embedding": "random",
                                                                               "dataset": datadir,
-                                                                              "model_path": model_path,
-                                                                              "text": kwargs.get('text',[])})
-    def run(self):
-        res = self.model.run()
+                                                                              "model_path": model_path})
+    def run(self, **kwargs):
+        res = self.model.run(text=kwargs.get('text',[]))
+        return res
+
+# 有监督模型进行命名实体识别
+class SEntityRecognition(object):
+    def __init__(self, model_path, model_type, mode, datadir='../supervised/ner/data/cluener'):
+        model_types = ['bert-base-chinese', "chinese-bert-wwm-ext", "ernie-1.0", "albert-base-chinese"]
+        if model_type not in model_types:
+             print("suport model_type: {}".format("##".join(model_types)))
+             os._exit(-1)
+        if not model_path and model_type in model_types:
+            print('model download automatically!')
+        self.model = supervised.sequence_labeling.NER(model_type, mode=mode, **{"data_dir": datadir,
+                                                                              "model_path": model_path})
+    def run(self, **kwargs):
+        res = self.model.run(text=kwargs.get('text',[]))
         return res

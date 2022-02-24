@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="unlp",
-    version="1.4.1",
+    version="1.4.2",
     author="hanscal",
     author_email="hanscalcai@163.com, unagi_jason@163.com",
     description="a library that get text embeddings",
@@ -15,7 +15,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Hanscal/unlp",
     packages=setuptools.find_packages(),
-    package_data = {'': ['*.txt'],},
+    package_data = {'': ['*.txt','.json'],},
     classifiers=[
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
