@@ -64,7 +64,7 @@ class Service(object):
                 resume_model_path = os.path.join(resume_model_path, WEIGHTS_NAME)
                 print("resume model from {}".format(resume_model_path))
                 self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
-            elif os.path.isfile(resume_model_path) and kwargs.get('resume'):
+            elif os.path.isfile(resume_model_path) and kwargs.get('resume',''):
                 print("resume model from {}".format(resume_model_path))
                 self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
 
@@ -134,13 +134,13 @@ if __name__ == '__main__':
     # res = service.run_predict(text=['艺龙网并购两家旅游网站'], model_path='./data/THUCNews/saved_dict/DPCNN.ckpt', embedding="random")
 
     # train-BERT
-    service = Service(model_name="ERNIE", mode='train', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-                                                          "model_path":"/Volumes/work/project/unlp/unlp/transformers/ernie-1.0",
-                                                          "resume":False})
-    res = service.run_train()
+    # service = Service(model_name="ERNIE", mode='train', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
+    #                                                       "model_path":"/Volumes/work/project/unlp/unlp/transformers/ernie-1.0",
+    #                                                       "resume":False})
+    # res = service.run_train()
     # predict-BERT
-    # service = Service(model_name="BERT", mode='predict', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-    #                                                         "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT",
-    #                                                         "resume":True})
-    # res = service.run_predict(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势"])
-    # print(res)
+    service = Service(model_name="BERT", mode='predict', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
+                                                            "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT",
+                                                            "resume":True})
+    res = service.run_predict(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势"])
+    print(res)

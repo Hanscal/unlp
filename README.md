@@ -72,7 +72,7 @@ retrieves = model.run(queries, top_k)  # queries为list, 实现批量文本语�
 ## TODO 监督学习方法
 ### 1. 文本分类  
 **model：通过model_path和model_type来制定模型**  
-  model_path可以为相应的model权重，如果为''，则会自动下载model权重；  
+  model_path可以为相应的model名称:支持['bert-base-chinese','ernie-1.0']或者是模型路径，如果为''，则会自动下载bert-base-chinese权重；  
   model_type目前支持['DPCNN', "FastText", "TextCNN", "TextRCNN", "TextRNN", "TextRNN_Att", "BERT", "ERNIE"]  
   mode为模型的三种模式：['train', "evaluate", "predict"]，分别对应于训练，评估和预测。
   datadir为模型的输入数据，格式可以通过这个命令查看：  
@@ -80,15 +80,55 @@ retrieves = model.run(queries, top_k)  # queries为list, 实现批量文本语�
 from unlp import ClassificationDataFormat
 ```
 **kwargs：额外需要传入的参数**  
-如果是预测**kwargs是{"text":List[str]}这样的格式；   
+如果是预测predict, kwargs是{"text":List[str]}这样的格式；   
+如果是训练train,可以设置resume为True (bool类型）控制是否继续训练，其他预测predict和评估evaluate阶段可以不传入这个参数  
 
 ```py
 from unlp import STextClassification
 model = STextClassification(model_path, model_type, mode, datadir, **kwargs)
 res = model.run()  # 实现模型的训练，评估和预测
 ```
+finetune训练代码示例:['BERT',"ERNIE"]需要传入model_path（为预训练模型所在目录或者通过字符串指定下载）, 其他model_type不需要传入，model_type=''
+
+```py
+from unlp import STextClassification
+model = STextClassification(model_path='bert-base-chinese', model_type='BERT', mode='train', datadir='./data/THUCNews', 
+**kwargs)
+res = model.run()
+```
+
+resume训练代码示例:所有model_type都需要传入model_path,['BERT',"ERNIE"]为保存模型所在目录，其他为模型文件
+
+```py
+from unlp import STextClassification
+model = STextClassification(model_path='bert-base-chinese', model_type='BERT', mode='train', datadir='./data/THUCNews', 
+**{"resume":True})
+res = model.run()
+```
+
+评估代码示例:所有model_type都需要传入model_path,['BERT',"ERNIE"]为保存模型所在目录，其他为模型文件
+
+```py
+from unlp import STextClassification
+model = STextClassification(model_path='bert-base-chinese', model_type='BERT', mode='evaluate', datadir='./data/THUCNews', 
+**kwargs)
+res = model.run()
+```
+
+预测代码示例:所有model_type都需要传入model_path,['BERT',"ERNIE"]为保存模型所在目录，其他为模型文件  
+**这时传入datadir的目的主要是为了加载datadir下的vocab文件，不会对数据进行加载**
+
+```py
+from unlp import STextClassification
+model = STextClassification(model_path='bert-base-chinese', model_type='BERT', mode='predict', datadir='./data/THUCNews', 
+**{"text":['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势","中华女子学院：本科层次仅1专业招男生"]})
+res = model.run()
+```
+
+**如果需要对模型其他参数进行调节，可以参考相应模型文件中的Config类**
 
 ### 2. 序列标注  
+
 
 ### 3. 文本生成  
 
