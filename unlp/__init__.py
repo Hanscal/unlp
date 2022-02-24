@@ -11,6 +11,7 @@ import unlp.taskflow
 from unlp import unsupervised
 from unlp import supervised
 from unlp.supervised import ClassificationDataFormat
+from unlp.supervised import NerDataFormat
 
 
 name = "unlp"
@@ -86,7 +87,6 @@ class STextClassification(object):
         self.model = supervised.text_classify.Classification(model_type, mode=mode, **{"use_word":False, "embedding": "random",
                                                                               "dataset": datadir,
                                                                               "model_path": model_path,
-                                                                              "pretrain_model_path": kwargs["pretrain_model_path"],
                                                                               "text": kwargs.get('text',[])})
     def run(self):
         res = self.model.run()

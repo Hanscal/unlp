@@ -59,7 +59,8 @@ class Config(object):
         # 实例化的时候就保存vocab.txt文件和config.json文件
         bert_token = BertTokenizer(os.path.join(self.bert_path, 'vocab.txt'))
         bert_token.save_vocabulary(self.save_path)
-        shutil.copyfile(os.path.join(self.bert_path, CONFIG_NAME), os.path.join(self.save_path, CONFIG_NAME))
+        if not os.path.exists(os.path.join(self.save_path, CONFIG_NAME)):
+            shutil.copyfile(os.path.join(self.bert_path, CONFIG_NAME), os.path.join(self.save_path, CONFIG_NAME))
         self.tokenizer = BertTokenizer.from_pretrained(self.bert_path)
         # print(self.tokenizer)
         self.hidden_size = 768

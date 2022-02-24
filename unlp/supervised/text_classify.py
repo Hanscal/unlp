@@ -26,14 +26,13 @@ class Classification(object):
         self.mode = mode
         self.kwargs = kwargs
 
-    def run(self):
+    def run(self,text=[]):
         b0 = time.time()
         if self.mode == 'train':
             res = self.model.run_train()
         elif self.mode == 'evaluate':
             res = self.model.run_evaluate()
         else:
-            text = self.kwargs.pop('text')
             res = self.model.run_predict(text)
         print('cost {}'.format(time.time() - b0))
         return res
@@ -41,7 +40,6 @@ class Classification(object):
 if __name__ == '__main__':
     # 预训练时可以通过resume (bool类型）控制是否继续训练，其他predict和evaluate阶段可以不传入这个参数
     classify = Classification("BERT", mode='predict', use_word=False, **{"embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-                                                                          "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT",
-                                                                          "text":['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势","中华女子学院：本科层次仅1专业招男生"]})
-    res = classify.run()
+                                                                          "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT"})
+    res = classify.run(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势","中华女子学院：本科层次仅1专业招男生"])
     print(res)

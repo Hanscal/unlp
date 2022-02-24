@@ -7,4 +7,6 @@
 """
 
 from unlp.supervised import text_classify
+from unlp.supervised import sequence_labeling
 from unlp.supervised.classification.data import THUCNews as ClassificationDataFormat
+from unlp.supervised.ner.data import cluner as NerDataFormat
