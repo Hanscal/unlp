@@ -105,3 +105,12 @@ class SEntityRecognition(object):
     def run(self, **kwargs):
         res = self.model.run(text=kwargs.get('text',[]))
         return res
+
+# 有监督模型进行文章摘要
+class STextSummarization(object):
+    def __init__(self, model_path, model_type, mode, datadir='../supervised/ner/data/cluener'):
+        self.model = supervised.text_summarize.Summarization(model_type, mode=mode, **{"data_dir": datadir,
+                                                                              "model_path": model_path})
+    def run(self, **kwargs):
+        res = self.model.run(text=kwargs.get('text',[]))
+        return res
