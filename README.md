@@ -130,6 +130,7 @@ res = model.run(text=['艺龙网并购两家旅游网站',"封基上周溃退 �
 
 ### 2. 序列标注 
 **命名实体识别**   
+
 **通过model_path和model_type来制定模型**  
   model_path可以为相应的model名称:支持['bert-base-chinese', "chinese-bert-wwm-ext", "ernie-1.0", "albert-base-chinese"]或者是模型路径，如果为''，则会自动下载bert-base-chinese权重；  
   model_type目前支持['bert-base-chinese', "chinese-bert-wwm-ext", "ernie-1.0", "albert-base-chinese"]  
@@ -188,6 +189,7 @@ res = model.run(text=['艺龙网并购两家旅游网站',"封基上周溃退 �
 
 ### 3. 文本生成  
 **文章摘要生成**   
+
 **通过model_path和model_type来制定模型**  
   model_path训练好的模型路径；  
   model_type目前支持['point-net"]  
