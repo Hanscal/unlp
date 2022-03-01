@@ -18,7 +18,7 @@ from gmodels.model import Model
 
 class Evaluate(object):
     def __init__(self, model=None, **kwargs):
-        config = get_argparse().parse_args()
+        config = get_argparse()
         args_bak = vars(config)
         for k, v in kwargs.items():
             if k in args_bak:

@@ -83,6 +83,28 @@ def write_for_rouge(reference_sents, decoded_words, ex_index,
         for idx, sent in enumerate(decoded_sents):
             f.write(sent) if idx == len(decoded_sents) - 1 else f.write(sent + "\n")
 
+def create_logger(filename):
+    """
+    将日志输出到日志文件和控制台
+    """
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+    # 创建一个handler，用于写入日志文件
+    file_handler = logging.FileHandler(filename=filename)
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+
+    # 创建一个handler，用于将日志输出到控制台
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    console.setFormatter(formatter)
+    logger.addHandler(console)
+
+    return logger
 
 if __name__ == '__main__':
     dec_rootdir = "/root/liuyouyuan/pyproject/pointer-generator-pytorch/log/decode_model_500000_20191012_193905"

@@ -23,7 +23,7 @@ from gutils.config import get_argparse
 
 class Predictor(object):
     def __init__(self, **kwargs):
-        config = get_argparse().parse_args()
+        config = get_argparse()
         args_bak = vars(config)
         for k, v in kwargs.items():
             if k in args_bak:

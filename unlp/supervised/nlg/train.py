@@ -34,7 +34,7 @@ def init_print(config):
 
 class Train(object):
     def __init__(self, **kwargs):
-        config = get_argparse().parse_args()
+        config = get_argparse()
         args_bak = vars(config)
         for k, v in kwargs.items():
             if k in args_bak:
@@ -190,7 +190,7 @@ class Train(object):
                 # print_interval = 100
                 if self.iter_step % self.config.logging_steps == 0:
                     # lr = self.optimizer.state_dict()['param_groups'][0]['lr']
-                    print('steps %d, seconds for %d steps: %.2f, loss: %f' % (self.iter_step, self.config.logging_steps,  time.time() - start, loss))
+                    print('steps %d, seconds for %d steps: %.2f, loss: %f' % (self.iter_step, self.config.logging_steps, time.time() - start, loss))
                     start = time.time()
 
                 # 100次迭代就保存一下模型
