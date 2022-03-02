@@ -14,9 +14,10 @@ pip install unlp
 ## 使用 unlp
 ----
 1. 主要分为无监督学习和有监督学习的方法；
-2. 主要是根据nlp的任务来构建这个包，
+2. 根据nlp的任务来构建这个包，
 比如无监督学习中有关键词抽取，向量嵌入和相似度计算；
-监督学习中有分类任务，命名实体识别，文本生成等。
+监督学习中有分类任务，命名实体识别，文本生成等。  
+3. 加入文本增强一些常用方法，比如回译，同义词替换等；  
 
 ## 无监督学习方法
 ### 目前支持
@@ -130,7 +131,7 @@ res = model.run(text=['艺龙网并购两家旅游网站',"封基上周溃退 �
 
 ### 2. 序列标注 
 **命名实体识别**   
-
+---
 **通过model_path和model_type来制定模型**  
   model_path可以为相应的model名称:支持['bert-base-chinese', "chinese-bert-wwm-ext", "ernie-1.0", "albert-base-chinese"]或者是模型路径，如果为''，则会自动下载bert-base-chinese权重；  
   model_type目前支持['bert-base-chinese', "chinese-bert-wwm-ext", "ernie-1.0", "albert-base-chinese"]  
@@ -189,7 +190,7 @@ res = model.run(text=['艺龙网并购两家旅游网站',"封基上周溃退 �
 
 ### 3. 文本生成  
 **文章摘要生成**   
-
+---
 **通过model_path和model_type来制定模型**  
   model_path训练好的模型路径；  
   model_type目前支持['point-net"]  
@@ -244,7 +245,75 @@ model = STextSummarization(model_path='./data/weibo/saved_dict/point-net/point-n
 res = model.run(text=["艺龙网并购两家旅游网站,封基上周溃退 未有明显估值优势,中华女子学院：本科层次仅1专业招男生"])
 ```
 
-**如果需要对模型其他参数进行调节，可以gutils下的config文件**  
+**如果需要对模型其他参数进行调节，可以gutils下的config文件** 
+
+**对话生成dialog-gpt**   
+---
+**通过model_path和model_type来制定模型**  
+  model_path训练好的模型路径；  
+  model_type目前支持['dialog-gpt"]  
+  mode为模型的三种模式：['train', "evaluate", "predict"]，分别对应于训练，评估和预测。
+  data_dir为模型的输入数据，格式可以通过这个命令查看：  
+```py
+from unlp import DialogueDataFormat
+```
+**kwargs：额外需要传入的参数**  
+如果是预测predict, run的参数需要传入text=List[str]这样的格式；   
+如果是训练train,可以设置resume为True (bool类型）控制是否继续训练，其他预测predict和评估evaluate阶段可以不传入这个参数  
+
+```py
+from unlp import SDialogueGeneration
+model = SDialogueGeneration(model_path, model_type, mode, datadir, **kwargs)
+res = model.run()  # 实现模型的训练，评估和预测
+```
+
+训练代码示例:如果模型为空，则从头开始训练，如果继续训练resume需要传入训练后的model_path,为模型的路径  
+
+```py
+from unlp import SDialogueGeneration
+model = SDialogueGeneration(model_path='./data/weibo/saved_dict/point-net/point-net.pt', model_type='point-net', mode='train', datadir='./data/weibo')
+res = model.run()
+```
+
+评估代码示例:所有model_type都需要传入model_path,为保存模型所在目录,结果默认返回损失 
+
+```py
+from unlp import SDialogueGeneration
+model = SDialogueGeneration(model_path='./data/weibo/saved_dict/point-net/point-net.pt', model_type='point-net', mode='evaluate', datadir='./data/weibo', 
+**kwargs)
+res = model.run()
+```
+
+评估代码示例:所有model_type都需要传入model_path,为保存模型所在目录，如果要进行rouge评估 
+
+```py
+from unlp import SDialogueGeneration
+model = SDialogueGeneration(model_path='./data/weibo/saved_dict/point-net/point-net.pt', model_type='point-net', mode='evaluate', datadir='./data/weibo', 
+**{"rouge":True, "refs":List[str], "preds":List[str]})
+res = model.run()
+```
+
+
+预测代码示例:所有model_type都需要传入model_path,为保存模型所在目录    
+**这时传入datadir的目的主要是为了加载datadir下的vocab文件，不会对数据进行加载**
+
+```py
+from unlp import SDialogueGeneration
+model = SDialogueGeneration(model_path='./data/weibo/saved_dict/point-net/point-net.pt', model_type='point-net', mode='predict', datadir='./data/weibo')
+res = model.run(text=["艺龙网并购两家旅游网站,封基上周溃退 未有明显估值优势,中华女子学院：本科层次仅1专业招男生"])
+```
+
+**如果需要对模型其他参数进行调节，可以gutils下的config文件** 
+
 
 ### 4. 文本对相关  
+
+
+## 文本数据增强  
+对于短文本，回译效果比较好。对于长文本，同义词替换效果比较好。  
+**回译**  
+
+**同义词替换**  
+
+
  

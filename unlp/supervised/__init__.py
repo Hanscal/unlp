@@ -12,3 +12,4 @@ from unlp.supervised import text_summarize
 from unlp.supervised.classification.data import THUCNews as ClassificationDataFormat
 from unlp.supervised.ner.data import cluner as NerDataFormat
 from unlp.supervised.nlg.data import weibo as SummarizationDataFormat
+from unlp.supervised.nlg.data import chnchat as DialogueDataFormat
