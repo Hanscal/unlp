@@ -27,6 +27,13 @@
     - 2.word2vec、词典同义词替换
         - 使用gensim的词向量，找出某个词最相似的词作为同义词。
    
-   
+# 使用方法
+**对于短文本，回译效果比较好。对于长文本，同义词替换效果比较好。**  
+ 
+### 回译  
+
+### 同义词替换  
+
+ 
 # 相关论文  
 《Easy data augmentation techniques for boosting performance on text classification tasks》
