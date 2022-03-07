@@ -7,11 +7,12 @@
 @Email   : hua.cai@unidt.com
 """
 import os
-import unlp.taskflow
 from unlp import unsupervised
 from unlp import supervised
 from unlp.supervised import ClassificationDataFormat
 from unlp.supervised import NerDataFormat
+from unlp.supervised import SummarizationDataFormat
+from unlp.supervised import DialogueDataFormat
 
 
 name = "unlp"
@@ -108,8 +109,17 @@ class SEntityRecognition(object):
 
 # 有监督模型进行文章摘要
 class STextSummarization(object):
-    def __init__(self, model_path, model_type, mode, datadir='../supervised/ner/data/cluener'):
+    def __init__(self, model_path, model_type, mode, datadir='../supervised/nlg/data/weibo'):
         self.model = supervised.text_summarize.Summarization(model_type, mode=mode, **{"data_dir": datadir,
+                                                                              "model_path": model_path})
+    def run(self, **kwargs):
+        res = self.model.run(text=kwargs.get('text',[]))
+        return res
+
+# 有监督模型进行对话生成
+class SDialogueGeneration(object):
+    def __init__(self, model_path, model_type, mode, datadir='../supervised/nlg/data/chnchat'):
+        self.model = supervised.dialogue_generation.DialogueGeneration(model_type, mode=mode, **{"data_dir": datadir,
                                                                               "model_path": model_path})
     def run(self, **kwargs):
         res = self.model.run(text=kwargs.get('text',[]))

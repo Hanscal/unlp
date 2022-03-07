@@ -6,22 +6,29 @@
 @Email   : hua.cai@unidt.com
 """
 import os
+import sys
 import jieba
 import synonyms
 import random
 from random import shuffle
 
-random.seed(2019)
+random.seed(2022)
 
 file_root = os.path.dirname(__file__)
+sys.path.append(file_root)
+from synonym_replace import EmbedReplace
 
 class EDA(object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         # 停用词列表，默认使用哈工大停用词表
         f = open(os.path.join(file_root, 'stopwords/hit_stopwords.txt'))
         self.stop_words = list()
         for stop_word in f.readlines():
             self.stop_words.append(stop_word.strip())
+        wv_path = kwargs.get('wv_path', '')
+        self.synonym_replacer = None
+        if os.path.exists(wv_path):
+            self.synonym_replacer = EmbedReplace(wv_path)
 
     ########################################################################
     # 同义词替换
@@ -143,6 +150,12 @@ class EDA(object):
             a_words = self.synonym_replacement(words, n_sr)
             augmented_sentences.append(' '.join(a_words))
 
+        # 词向量同义词替换er
+        if self.synonym_replacer is not None:
+            for _ in range(num_new_per_technique*2): # 如果用了这个方法，则产生两倍的数量
+                a_words = self.synonym_replacer.run_replace(sentence)
+                augmented_sentences.append(' '.join(a_words))
+
         # 随机插入ri
         for _ in range(num_new_per_technique):
             a_words = self.random_insertion(words, n_ri)
@@ -172,6 +185,7 @@ class EDA(object):
         return augmented_sentences
 
 if __name__ == '__main__':
-    eda = EDA()
-    res = eda.run(sentence="我们就像蒲公英，我也祈祷着能和你飞去同一片土地")
-    print(res)
+    kwargs = {"wv_path":'/Volumes/work/project/unlp//unlp/transformers/word2vec/light_Tencent_AILab_ChineseEmbedding.bin'}
+    eda = EDA(**kwargs)
+    res = eda.run(sentence="我们就像蒲公英，我也祈祷着能和你飞去同一片土地", num_aug=4)
+    print(len(res), res)

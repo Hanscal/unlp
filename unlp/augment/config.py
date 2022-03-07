@@ -15,26 +15,10 @@ language_short_other = ['en', 'en_US', 'ar', 'ar_AE', 'ar_BH', 'ar_DZ', 'ar_EG',
 # 语言缩写，国内在线翻译
 language_short_google = ['en', 'fr', 'ru', 'de', 'es', 'pt', 'ar', 'ja', 'ko', 'it', 'be', 'nl', 'bg', 'el', 'ca', 'iw', 'is', 'sh', 'sv', 'sq', 'no', 'fi', 'hr', 'ro', 'pl', 'lt', 'th', 'mk', 'sk', 'et', 'da', 'hu', 'sl', 'tr', 'uk', 'lv', 'cs', 'sr']
 language_short_baidu = ['en', 'fra', 'ru', 'de', 'est', 'pt', 'ara', 'jp', 'kor', 'vie', 'yue', 'wyw', 'spa', 'th', 'it', 'el', 'nl', 'pl', 'bul', 'dan', 'fin', 'cs', 'rom', 'slo', 'swe', 'hu', 'cht']
-language_short_youdao = ['en', 'fr', 'ru', 'de', 'es', 'pt', 'ar', 'ja', 'ko', 'vi', 'id']
-language_short_sougou = ['en', 'fr', 'ru', 'de', 'es', 'pt', 'ar', 'ja', 'ko', 'vi', 'id', 'it', 'et', 'bg', 'pl', 'bs-Latn', 'fa', 'mww', 'da', 'fi', 'tlh-Qaak', 'tlh', 'hr', 'otq', 'ca', 'cs', 'ro', 'lv', 'ht', 'lt', 'nl', 'ms', 'mt', 'sl', 'th', 'tr', 'sk', 'sw', 'af', 'no', 'uk', 'ur', 'el', 'hu', 'cy', 'yua', 'he', 'hi', 'sv', 'yue', 'fj', 'fil', 'sm', 'to', 'ty', 'mg', 'bn', 'sr-Latn', 'sr-Cyrl']
-language_short_tencent = ['en', 'fr', 'ru', 'de', 'es', 'pt',      'jp', 'ko', 'vi', 'id', 'it', 'kr', 'tr', 'ms', 'th']
 
-
-# 在线翻译账户密码，自己去注册吧
+# 在线翻译账户密码，需要自己注册
 app_key_google = ""
 app_secret_google = ""
 
-app_key_bing = ""
-app_secret_bing = ""
-
 app_key_baidu = ""
 app_secret_baidu = ""
-
-app_key_youdao = ""
-app_secret_youdao = ""
-
-app_key_sougou = ""
-app_secret_sougou = ""
-
-app_key_tencent = ""
-app_secret_tentcnet = ""
