@@ -1,5 +1,12 @@
 <h1 align="center"><a href="https://github.com/hanscal/unlp" target="_blank">unlp</a></h1>
 
+<div align="center">
+
+[![PyPI version](https://badge.fury.io/py/unlp.svg)](https://badge.fury.io/py/unlp)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/unlp.svg)](https://pypi.python.org/pypi/unlp)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/Hanscal/unlp/pulls)
+</div>
+
 <p align="center">
   <a href="https://github.com/Hanscal/unlp/stargazers"><img alt="star" src="https://img.shields.io/github/stars/Hanscal/unlp.svg?label=Stars&style=social"/></a>
   <a href="https://github.com/Hanscal/unlp/network/members"><img alt="star" src="https://img.shields.io/github/forks/Hanscal/unlp.svg?label=Fork&style=social"/></a>
@@ -49,7 +56,7 @@ pip install -r requirements.txt
 ## 文本数据增强  
 [详细使用说明](https://github.com/Hanscal/unlp/blob/master/unlp/augment/README.md)
 1. 回译；  
-2. EDA(同义词替换、插入、交换和删除)； 
+2. EDA(同义词替换、插入、交换和删除)；   
 ...
 
 
