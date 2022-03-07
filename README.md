@@ -32,12 +32,25 @@ pip install -r requirements.txt
 
 ## 无监督学习方法
 [详细使用说明](https://github.com/Hanscal/unlp/blob/master/unlp/unsupervised/README.md)
+1. 关键词抽取；  
+2. 向量嵌入；  
+3. 相似度计算；  
+4. 语义搜索；  
+...
 
 ## 监督学习方法
 [详细使用说明](https://github.com/Hanscal/unlp/blob/master/unlp/supervised/README.md)
+1. 文本分类； 
+2. 命名实体识别；  
+3. 文本摘要；  
+4. 对话生成；  
+...
 
 ## 文本数据增强  
 [详细使用说明](https://github.com/Hanscal/unlp/blob/master/unlp/augment/README.md)
+1. 回译；  
+2. EDA(同义词替换、插入、交换和删除)； 
+...
 
 
  
