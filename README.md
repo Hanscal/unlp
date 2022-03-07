@@ -14,11 +14,7 @@
   
 </p>
 
-<p align="center">
-
-`gitHub`欢迎提[pull requests](https://github.com/Hanscal/unlp/pulls), 如果有`bug`或`新需求`，请反馈[issue](https://github.com/Hanscal/unlp/issues) 
-
-</p>
+<center>`gitHub`欢迎提pull requests, 如果有`bug`或`新需求`，请反馈issue</center>
 
 ## unlp
 
