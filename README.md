@@ -6,14 +6,14 @@
   <a href="https://github.com/Hanscal/unlp/watchers"><img alt="star" src="https://img.shields.io/github/watchers/Hanscal/unlp.svg?label=Watch&style=social"/></a>
 </p>
 
-`gitHub`欢迎提[pull requests](https://github.com/Hanscal/unlp/pulls), 如果有`bug`或`新需求`，请反馈[issue](https://github.com/Hanscal/unlp/issues)
+**`gitHub`欢迎提[pull requests](https://github.com/Hanscal/unlp/pulls), 如果有`bug`或`新需求`，请反馈[issue](https://github.com/Hanscal/unlp/issues)**
 
 ## unlp
 
 unlp是一些经常需要用到的NLP算法包，有助于您学习和使用基于深度学习的文本处理。
 
-**python3.6+**
 ## 安装
+**python3.6+**
 
 ```py
 pip install unlp 
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 4. 文本增强常用方法，比如回译，同义词替换等。
 
 ## unlp使用
-1. 具体参见[示例目录](https://github.com/Hanscal/unlp/tree/master/examples)  
+具体参见[示例目录](https://github.com/Hanscal/unlp/tree/master/examples)  
 
 ## 无监督学习方法
 [详细使用说明](https://github.com/Hanscal/unlp/blob/master/unlp/unsupervised/README.md)

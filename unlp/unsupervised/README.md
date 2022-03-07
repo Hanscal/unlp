@@ -76,4 +76,4 @@ retrieves = model.run(queries, top_k)  # queries为list, 实现批量文本语�
 
    
 # 相关论文  
-keyword-bert: Self-Supervised Contextual Keyword and Keyphrase Retrieval with Self-Labelling.
+[1] keyword-bert: Self-Supervised Contextual Keyword and Keyphrase Retrieval with Self-Labelling.
