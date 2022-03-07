@@ -14,7 +14,10 @@
   
 </p>
 
-<center>`gitHub`欢迎提pull requests, 如果有`bug`或`新需求`，请反馈issue</center>
+<div align="center">
+  
+`gitHub`欢迎提pull requests, 如果有`bug`或`新需求`，请反馈issue
+</div>
 
 ## unlp
 
