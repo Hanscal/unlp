@@ -28,6 +28,7 @@
 
 ### 同义词替换  
 
+**[其他方法](https://github.com/425776024/nlpcda)**
  
 # 相关论文  
 [1] 《Easy data augmentation techniques for boosting performance on text classification tasks》
