@@ -31,7 +31,7 @@ class DialogueGeneration(object):
 
 if __name__ == '__main__':
     # 预训练时可以通过resume (bool类型）控制是否继续训练，其他predict和evaluate阶段可以不传入这个参数
-    dg = DialogueGeneration("point-net", mode='predict', use_word=False, **{"data_dir": '/Volumes/work/project/unlp/unlp/supervised/nlg/data/weibo',
-                                                                          "model_path":"/Volumes/work/project/unlp/unlp/supervised/nlg/data/weibo/saved_dict/point-net/point-net.pt"})
+    dg = DialogueGeneration("dialogue-gpt", mode='predict',  **{"data_dir": '/Volumes/work/project/unlp/unlp/supervised/nlg/data/chnchat',
+                                                                "model_path":"/Volumes/work/project/unlp/unlp/transformers/gpt2-chnchit"})
     res = dg.run(text=['艺龙网并购两家旅游网站,封基上周溃退 未有明显估值优势,中华女子学院：本科层次仅1专业招男生'])
     print(res)

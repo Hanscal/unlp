@@ -64,7 +64,7 @@ class EarlyStopping:
         self.val_loss_min = val_loss
 
 
-def create_model(args, vocab_size):
+def create_model(args, is_eval=False):
     """
     :param args:
     :param vocab_size:字典大小
@@ -81,6 +81,8 @@ def create_model(args, vocab_size):
     # model.resize_token_embeddings(vocab_size)
     model = model.to(args.device)
     print('model config:\n{}'.format(model.config.to_json_string()))
+    if is_eval:
+        model = model.eval()
     return model
 
 def caculate_loss(logit, target, pad_idx, smoothing=True):

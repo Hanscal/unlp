@@ -15,8 +15,8 @@ from typing import List
 file_root = os.path.dirname(__file__)
 sys.path.append(file_root)
 
-from gpt_train import Train
-from gpt_eval import Evaluate
+from gpt_train import Trainer
+from gpt_eval import Evaluator
 from gpt_predict import Predictor
 
 class Service(object):
@@ -31,13 +31,13 @@ class Service(object):
         if mode == 'train':
             # model_path = kwargs['model_path']
             # data_dir = kwargs['data_dir'] 一定要包含data_dir
-            self.trainer = Train(**kwargs)
+            self.trainer = Trainer(**kwargs)
 
         elif mode == 'evaluate':
             # load eval dataset
             # model_path = kwargs['model_path']  #一定要包含model_path 和 model_path
             # data_dir = kwargs['data_dir']
-            self.evaluator = Evaluate(**kwargs)
+            self.evaluator = Evaluator(**kwargs)
 
         elif mode == 'predict':
             # model_path = os.path.join(file_root, 'data/weibo/saved_dict/point-net/point-net.pt') # 必须包含model_path
@@ -66,7 +66,7 @@ class Service(object):
 if __name__ == '__main__':
     article = "近日，一段消防员用叉子吃饭的视频在网上引起热议。原来是因为训练强度太大，半天下来，大家拿筷子的手一直在抖，甚至没法夹菜。于是，用叉子吃饭，渐渐成了上海黄浦消防车站中队饭桌上的传统。转发，向消防员致敬！"
     # model_path = sys.argv[1]
-    model_path = os.path.join(file_root, 'data/weibo/saved_dict/point-net/point-net.pt')
-    p = Service(**{"model_path": model_path, "data_dir": os.path.join(file_root, 'data/weibo')})
+    model_path = "/Volumes/work/project/unlp/unlp/transformers/gpt2-chnchit"
+    p = Service(**{"model_path": model_path, "data_dir": os.path.join(file_root, 'data/chnchat')})
     res = p.run_predict([article])
     print(res)

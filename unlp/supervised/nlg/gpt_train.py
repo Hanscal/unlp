@@ -21,15 +21,15 @@ from datetime import datetime
 from gmodels.gpt_model import calculate_acc, EarlyStopping, create_model
 from gutils.gpt_data import collate_fn, load_dataset
 from gutils.utils import create_logger
-from gutils.config import set_gpt_args
-from gpt_eval import validate_epoch
+from gutils.config import get_gpt_args
+from gpt_eval import Evaluator
 
 CONFIG_NAME = 'config.json'
 
 class Trainer(object):
     def __init__(self, **kwargs):
         # 初始化参数
-        config = set_gpt_args(**kwargs)
+        config = get_gpt_args(**kwargs)
         # set cuda and device
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         config.device = device
@@ -62,14 +62,15 @@ class Trainer(object):
         config.sep_id = self.tokenizer.sep_token_id
         config.pad_id = self.tokenizer.pad_token_id
         config.cls_id = self.tokenizer.cls_token_id
-        vocab_size = self.tokenizer.vocab_size
 
-        self.model = create_model(config, vocab_size)
+        # 如果没有传入model_path, 需要将model_config传入create_model函数中从头开始训练
+        self.model = create_model(config)
         assert self.model.config.vocab_size == self.tokenizer.vocab_size
 
         # 加载训练集和验证集
         # ========= Loading Dataset ========= #
-        self.train_dataset, self.validate_dataset, self.test_dataset = load_dataset(self.vocab_path, data_dir, config.max_len)
+        self.train_dataset = load_dataset(self.vocab_path, data_dir, config.max_len)
+        self.validate_dataset = load_dataset(self.vocab_path, data_dir, config.max_len, mode='eval')
 
         # save config.json to model_save_dir
         shutil.copyfile(os.path.join(config.model_path, CONFIG_NAME), os.path.join(self.model_save_dir, CONFIG_NAME))
@@ -147,8 +148,7 @@ class Trainer(object):
                     self.logger.info("batch {} of epoch {}, loss {}, batch_acc {}, lr {}".format(batch_idx + 1, epoch + 1, loss.item() * self.config.gradient_accumulation_steps, batch_acc, scheduler.get_lr()))
                 if (batch_idx + 1) % self.config.save_step == 0:
                     # ========== validate ========== #
-                    validate_loss = validate_epoch(model=self.model, validate_dataloader=self.validate_dataloader,
-                                                    logger=self.logger, epoch=epoch, args=self.config)
+                    validate_loss = self.evaluate.run_eval(model=self.model)
 
                     # 保存当前困惑度最低的模型，困惑度低，模型的生成效果不一定会越好
                     if validate_loss < best_val_loss:
@@ -185,8 +185,6 @@ class Trainer(object):
             self.train_dataset, batch_size=self.config.batch_size, shuffle=True, num_workers=self.config.num_workers, collate_fn=collate_fn,
             drop_last=True
         )
-        self.validate_dataloader = DataLoader(self.validate_dataset, batch_size=self.config.batch_size, shuffle=True,
-                                         num_workers=self.config.num_workers, collate_fn=collate_fn, drop_last=True)
 
         t_total = len(train_dataloader) // self.config.gradient_accumulation_steps * self.config.epochs
 
@@ -198,6 +196,7 @@ class Trainer(object):
 
         self.logger.info('starting training')
         # 开始训练
+        self.evaluate = Evaluator(**{"data_dir": self.config.data_dir})
         for epoch in range(self.config.epochs):
             # ========== train ========== #
             train_loss = self.train_epoch(train_dataloader=train_dataloader, optimizer=optimizer, scheduler=scheduler,epoch=epoch)

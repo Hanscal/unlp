@@ -177,7 +177,7 @@ class Train(object):
         # 训练设置，包括
         start = time.time()
         loss_eval = 10
-
+        evaluate = Evaluate(**{"data_dir": self.config.data_dir})
         for _ in tqdm(range(self.config.num_train_epochs), desc="Training epoch"):
             for _ in tqdm(range(self.config.max_iter_steps_epoch), desc="Steps per epoch"):
                 # 获取下一个batch数据
@@ -195,8 +195,7 @@ class Train(object):
 
                 # 100次迭代就保存一下模型
                 if self.iter_step % self.config.save_steps == 0:
-                    evaluate = Evaluate(model=self.model,**{"data_dir":self.config.data_dir})
-                    loss_dev = evaluate.run_eval()
+                    loss_dev = evaluate.run_eval(model=self.model)
                     if loss_dev < loss_eval:
                         loss_eval = loss_dev
                     self.save_model(self.running_avg_loss, self.iter_step)

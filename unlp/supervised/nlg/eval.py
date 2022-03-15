@@ -17,7 +17,7 @@ from gutils.batcher import get_output_from_batch
 from gmodels.model import Model
 
 class Evaluate(object):
-    def __init__(self, model=None, **kwargs):
+    def __init__(self, **kwargs):
         config = get_argparse()
         args_bak = vars(config)
         for k, v in kwargs.items():
@@ -31,10 +31,6 @@ class Evaluate(object):
         data_dir = os.path.join(config.data_dir, 'data') if not config.data_dir.endswith('data') else config.data_dir
         self.vocab = Vocab(os.path.join(data_dir, 'vocab.txt'), config.vocab_size)
         self.batcher = Batcher(os.path.join(data_dir, 'dev.json'), self.vocab, mode='eval', config=config, single_pass=True)
-        if model is None:
-            self.model = Model(config, is_eval=True)
-        else:
-            self.model = model
         self.config = config
 
     def eval_one_batch(self, batch):
@@ -70,8 +66,13 @@ class Evaluate(object):
 
         return loss.item()
 
-    def run_eval(self):
+    def run_eval(self, model=None):
         running_avg_loss, iter_step = 0, 0
+        if model is None:
+            self.model = Model(self.config, is_eval=True)
+        else:
+            self.model = model
+
         start = time.time()
         batch = self.batcher.next_batch()
         while batch:

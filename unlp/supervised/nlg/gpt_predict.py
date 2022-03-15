@@ -13,14 +13,14 @@ from torch.nn import functional as F
 from transformers import BertTokenizerFast, GPT2LMHeadModel
 
 sys.path.append(os.path.dirname(__file__))
-from gutils.config import set_gpt_args
+from gutils.config import get_gpt_args
 
 CONFIG_NAME = 'config.json'
 
 class Predictor(object):
     def __init__(self, **kwargs):
         # 初始化参数
-        config = set_gpt_args(**kwargs)
+        config = get_gpt_args(**kwargs)
         # set cuda and device
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         config.device = device

@@ -36,19 +36,21 @@ class MyDataset(Dataset):
     def __len__(self):
         return len(self.input_list)
 
-def load_dataset(vocab_path, data_dir, max_len):
+def load_dataset(vocab_path, data_dir, max_len, mode='train'): # 通过三种模式控制load
     """
     加载训练集和验证集
     """
-    input_list_train = preprocess(vocab_path=vocab_path, data_path=os.path.join(data_dir, 'train.txt'))
-    input_list_val = preprocess(vocab_path=vocab_path, data_path=os.path.join(data_dir, 'dev.txt'))
-    input_list_test = preprocess(vocab_path=vocab_path, data_path=os.path.join(data_dir, 'test.txt'))
+    if mode == 'eval':
+        input_list_val = preprocess(vocab_path=vocab_path, data_path=os.path.join(data_dir, 'dev.txt'))
+        my_dataset = MyDataset(input_list_val, max_len)
+    elif mode == 'test':
+        input_list_test = preprocess(vocab_path=vocab_path, data_path=os.path.join(data_dir, 'test.txt'))
+        my_dataset = MyDataset(input_list_test, max_len)
+    else:
+        input_list_train = preprocess(vocab_path=vocab_path, data_path=os.path.join(data_dir, 'train.txt'))
+        my_dataset = MyDataset(input_list_train, max_len)
 
-    train_dataset = MyDataset(input_list_train, max_len)
-    val_dataset = MyDataset(input_list_val, max_len)
-    test_dataset = MyDataset(input_list_test, max_len)
-
-    return train_dataset, val_dataset, test_dataset
+    return my_dataset
 
 def collate_fn(batch):
     input_ids = rnn.pad_sequence(batch, batch_first=True, padding_value=0)
