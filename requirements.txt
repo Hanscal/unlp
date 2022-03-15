@@ -1,5 +1,6 @@
 jieba
 numpy
 gensim
+scikit-learn>=0.22.2
 transformers>=4.15.0
 sentence-transformers==2.0.0
