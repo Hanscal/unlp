@@ -40,6 +40,7 @@ pip install -r requirements.txt
 
 ## unlp使用
 具体参见[示例目录](https://github.com/Hanscal/unlp/tree/master/examples)  
+项目使用过程中有的任务需要自动下载预训练模型，在百度网盘提供了部分已经下载好了的模型：[预训练模型](https://pan.baidu.com/s/1gXv14q-uzQb9urhveQKzeg)  密码: 6lk1
 
 ## 无监督学习方法
 [详细使用说明](https://github.com/Hanscal/unlp/blob/master/unlp/unsupervised/README.md)
