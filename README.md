@@ -39,8 +39,8 @@ pip install -r requirements.txt
 4. 文本增强常用方法，比如回译，同义词替换等。
 
 ## unlp使用
-具体参见[示例目录](https://github.com/Hanscal/unlp/tree/master/examples)  
-项目使用过程中有的任务需要自动下载预训练模型，在百度网盘提供了部分已经下载好了的模型：  
+1. 具体参见[示例目录](https://github.com/Hanscal/unlp/tree/master/examples)  
+2. 项目中有的任务需要自动下载预训练模型，在百度网盘提供部分已经下载了的模型：  
 [预训练模型](https://pan.baidu.com/s/1gXv14q-uzQb9urhveQKzeg)  密码: 6lk1
 
 ## 无监督学习方法
