@@ -54,7 +54,7 @@ class Translator(object):
 
     def back_translate(self, text, src_lang="zh", tgt_lang="en"):
         """
-        :param q: 文本
+        :param text: 文本
         :param src_lang: 原始语言
         :param tgt_lang: 目前语言
         :return: 回译后的文本
