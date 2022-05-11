@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 @Time    : 2022/3/2 2:46 下午
 @Author  : hcai
@@ -8,7 +7,7 @@
 import os
 import sys
 import jieba
-import synonyms
+
 import random
 from random import shuffle
 
@@ -17,6 +16,7 @@ random.seed(2022)
 file_root = os.path.dirname(__file__)
 sys.path.append(file_root)
 from synonym_replace import EmbedReplace
+
 
 class EDA(object):
     def __init__(self, **kwargs):
@@ -30,11 +30,14 @@ class EDA(object):
         if os.path.exists(wv_path):
             self.synonym_replacer = EmbedReplace(wv_path)
 
-    ########################################################################
-    # 同义词替换
-    # 替换一个语句中的n个单词为其同义词
-    ########################################################################
     def synonym_replacement(self, words, n):
+        """
+        :param words:词表
+        :param n:替换词数量
+        :return:替换后的文本
+        同义词替换
+        替换一个语句中的n个单词为其同义词
+        """
         new_words = words.copy()
         random_word_list = list(set([word for word in words if word not in self.stop_words]))
         random.shuffle(random_word_list)
@@ -53,23 +56,24 @@ class EDA(object):
 
         return new_words
 
-
     def get_synonyms(self, word):
         return synonyms.nearby(word)[0]
 
-
-    ########################################################################
-    # 随机插入
-    # 随机在语句中插入n个词
-    ########################################################################
     def random_insertion(self, words, n):
+        """
+        :param words:词表
+        :param n:插入词的数量
+        :return:插入词语后的语句
+        随机插入
+        随机在语句中插入n个词
+        """
         new_words = words.copy()
         for _ in range(n):
             self.add_word(new_words)
         return new_words
 
-
     def add_word(self, new_words):
+        """添加词汇"""
         synonyms = []
         counter = 0
         while len(synonyms) < 1:
@@ -82,18 +86,18 @@ class EDA(object):
         random_idx = random.randint(0, len(new_words) - 1)
         new_words.insert(random_idx, random_synonym)
 
-
-    ########################################################################
-    # Random swap
-    # Randomly swap two words in the sentence n times
-    ########################################################################
-
     def random_swap(self, words, n):
+        """
+        :param words:词表
+        :param n:随机交换词汇的次数
+        :return:交换n次后的语句
+        Random swap
+        Randomly swap two words in the sentence n times
+        """
         new_words = words.copy()
         for _ in range(n):
             new_words = self.swap_word(new_words)
         return new_words
-
 
     def swap_word(self, new_words):
         random_idx_1 = random.randint(0, len(new_words) - 1)
@@ -107,12 +111,13 @@ class EDA(object):
         new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1]
         return new_words
 
-
-    ########################################################################
-    # 随机删除
-    # 以概率p删除语句中的词
-    ########################################################################
     def random_deletion(self, words, p):
+        """
+        :param words:词表
+        :param p:概率
+        :return:概率删除后的语句
+        以概率p删除语句中的词
+        """
         if len(words) == 1:
             return words
 
@@ -128,10 +133,16 @@ class EDA(object):
 
         return new_words
 
-
-    ########################################################################
-    # EDA函数
     def run(self, sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9):
+        """
+        :param sentence:段落
+        :param alpha_sr:同义词替换率
+        :param alpha_ri: 随机插入率
+        :param alpha_rs: 随机交换率
+        :param p_rd:概率
+        :param num_aug:num_aug
+        :return:增强后的数据
+        """
         seg_list = jieba.cut(sentence)
         seg_list = " ".join(seg_list)
         words = list(seg_list.split())
@@ -152,7 +163,7 @@ class EDA(object):
 
         # 词向量同义词替换er
         if self.synonym_replacer is not None:
-            for _ in range(num_new_per_technique*2): # 如果用了这个方法，则产生两倍的数量
+            for _ in range(num_new_per_technique*2):  # 如果用了这个方法，则产生两倍的数量
                 a_words = self.synonym_replacer.run_replace(sentence)
                 augmented_sentences.append(' '.join(a_words))
 
@@ -183,6 +194,7 @@ class EDA(object):
         augmented_sentences.append(seg_list)
 
         return augmented_sentences
+
 
 if __name__ == '__main__':
     kwargs = {"wv_path":'/Volumes/work/project/unlp//unlp/transformers/word2vec/light_Tencent_AILab_ChineseEmbedding.bin'}
