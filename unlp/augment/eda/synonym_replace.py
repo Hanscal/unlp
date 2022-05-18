@@ -7,69 +7,110 @@
 """
 # 回译
 
-from urllib.parse import quote
-import http.client
-import hashlib
-import urllib
-import random
-import json
-import time
+import os
+import numpy as np
+import jieba
+import jieba.analyse
+from gensim.models import KeyedVectors
+from gensim import matutils
 
 
-class Translator(object):
-    def translate(self, q, src_lang, tgt_lang):
+def read_samples(file_path):
+    """
+    :param file_path: 文本文件的路径
+     读入文本数据
+    """
+    samples = []
+    with open(file_path, 'r', encoding='utf8') as file:
+        for line in file:
+            if not line.strip():
+                continue
+            samples.append(line.strip())
+    return samples
+
+
+class EmbedReplace(object):
+    """
+     EmbedReplace: 同义词替换
+    """
+    def __init__(self, wv_path, **kwargs):
         """
-        :param q:翻译前文本
-        :param src_lang: 原始语言
-        :param tgt_lang: 目标语言
-        :return: 翻译后的文本
-        请求百度通用翻译API，详细请看 https://api.fanyi.baidu.com/doc/21
+        :param wv_path: w2v模型路径
+         加载w2v模型 KeyedVectors可以完成相似性查找
         """
-        appid = '20220302001105912'  # Fill in your AppID
-        secretKey = 'Gpginf0ryq4tRXBEgGyD'  # Fill in your key
+        binary = False
+        if wv_path.endswith('bin'):
+            binary = True
+        print("loading word2vec model from {}".format(wv_path))
+        # load_word2vec_format: 加载 save_word2vector_format 后的模型
+        # {word: vector}
+        self.wv = KeyedVectors.load_word2vec_format(wv_path, binary=binary)
 
-        httpClient = None
-        myurl = '/api/trans/vip/translate'
-
-        salt = random.randint(0, 4000)
-        sign = appid + q + str(salt) + secretKey
-        sign = hashlib.md5(sign.encode()).hexdigest()
-        myurl = '/api/trans/vip/translate' + '?appid=' + appid + '&q=' + urllib.parse.quote(
-            q) + '&from=' + src_lang + '&to=' + tgt_lang + '&salt=' + str(salt) + '&sign=' + sign
-
-        try:
-            httpClient = http.client.HTTPConnection('api.fanyi.baidu.com')
-            httpClient.request('GET', myurl)
-            # response is HTTPResponse object
-            response = httpClient.getresponse()
-            result_all = response.read().decode("utf-8")
-            result = json.loads(result_all)
-
-            return result
-
-        except Exception as e:
-            print(e)
-        finally:
-            if httpClient:
-                httpClient.close()
-
-    def back_translate(self, text, src_lang="zh", tgt_lang="en"):
+    def is_chinese(self, word):
         """
-        :param text: 文本
-        :param src_lang: 原始语言
-        :param tgt_lang: 目前语言
-        :return: 回译后的文本
+        :param word: 词组
+        :return: True / False
+         判断是否含有中文字符
         """
-        en = self.translate(text, src_lang, tgt_lang)['trans_result'][0]['dst']
-        time.sleep(1.5)
-        target = self.translate(en, tgt_lang, src_lang)['trans_result'][0]['dst']
-        time.sleep(1.5)
+        for ch in word:
+            if '\u4e00' <= ch <= '\u9fff':
+                return True
+        return False
 
-        return en, target
+    def vectorize(self, docs, vocab_size):
+        """
+        :param docs: 语料库
+        :param vocab_size: 词表大小
+        """
+        # Convert corpus into a dense numpy 2D array, with documents as columns.
+        return matutils.corpus2dense(docs, vocab_size)
+
+    def extract_keywords(self, text, topk=5):
+        """
+        :param topk: 前 topk 个关键词
+        :return: topk个关键词组成的列表
+         提取关键词
+        """
+        # 使用TF-IDF算法提取关键词
+        keys = jieba.analyse.extract_tags(text, topK=topk)
+        return keys
+
+    def replace_words(self, sample, keywords, ratio=0.2):
+        """
+        :param sample: 参考token列表
+        :param keywords: 关键词表（防止关键词被替换影响句义）
+        :param ratio: 替换比率
+        :return: 新的文本
+         用word2vector的近义词来替换，并避开关键词
+        """
+        num = int(len(sample) * ratio)  # 随机替换20%的单词
+        new_tokens = sample.copy()
+
+        indexes = np.random.choice(len(sample), num)
+        for index in indexes:
+            token = sample[index]
+            # sample[index]是中文字符 且 sample[index]不在关键词列表中 且 sample[index]在w2v模型生成的词表中
+            if self.is_chinese(token) and token not in keywords and token in self.wv:
+                new_tokens[index] = self.wv.most_similar(positive=token, negative=None, topn=1)[0][0]
+
+        return new_tokens
+
+    def run_replace(self, sample):
+        """
+        :param sample: read_samples('corpus.txt')
+        :return: replace(cut(extract(sample)))
+         同义词替换过程
+        """
+        keys = self.extract_keywords(sample)
+        tokens = jieba.lcut(sample)
+        res = self.replace_words(tokens, keys)
+        return res
 
 
 if __name__ == '__main__':
-    t = Translator()
-    en, tgt = t.back_translate('你好呀', src_lang='zh', tgt_lang='en')
-    print("English", en)
-    print("Chinese", tgt)
+    data_dir = '/Volumes/work/project/unlp/unlp/augment/data'
+    samples = read_samples(os.path.join(data_dir, 'corpus.txt'))
+    wv_path = '/Volumes/work/project/unlp//unlp/transformers/word2vec/light_Tencent_AILab_ChineseEmbedding.bin'
+    replacer = EmbedReplace(wv_path)
+    res = replacer.run_replace(samples)
+    print(res)
