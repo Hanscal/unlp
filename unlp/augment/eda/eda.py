@@ -7,7 +7,8 @@
 import os
 import sys
 import jieba
-
+if __name__ == '__main__':
+    import synonyms
 import random
 from random import shuffle
 
@@ -19,9 +20,14 @@ from synonym_replace import EmbedReplace
 
 
 class EDA(object):
+    """
+     EDA:Easy Data Augmentation
+    """
     def __init__(self, **kwargs):
-        # 停用词列表，默认使用哈工大停用词表
-        f = open(os.path.join(file_root, 'stopwords/hit_stopwords.txt'))
+        """
+         停用词表，默认使用哈工大版本
+        """
+        f = open(os.path.join(file_root, 'stopwords/hit_stopwords.txt'), encoding='UTF-8')
         self.stop_words = list()
         for stop_word in f.readlines():
             self.stop_words.append(stop_word.strip())
@@ -32,13 +38,14 @@ class EDA(object):
 
     def synonym_replacement(self, words, n):
         """
-        :param words:词表
-        :param n:替换词数量
-        :return:替换后的文本
-        同义词替换
-        替换一个语句中的n个单词为其同义词
+        :param words: sentence样本
+        :param n: 替换词数量
+        :return: 替换后的文本
+         替换一个语句中的n个单词为其同义词
         """
         new_words = words.copy()
+
+        # 去重后的[ words中 不在self.stop_words中 的word ]
         random_word_list = list(set([word for word in words if word not in self.stop_words]))
         random.shuffle(random_word_list)
         num_replaced = 0
@@ -51,21 +58,27 @@ class EDA(object):
             if num_replaced >= n:
                 break
 
+        # 用‘ ’做分隔符把列表中的词连成句子后在拆成列表
         sentence = ' '.join(new_words)
         new_words = sentence.split(' ')
 
         return new_words
 
     def get_synonyms(self, word):
+        """
+        :param word: 词语
+        :return: word的近义词列表
+        """
+
+        # synonyms.nearby(word) -> [[ 近义词词组 ], [ 相似度 ]]
         return synonyms.nearby(word)[0]
 
     def random_insertion(self, words, n):
         """
-        :param words:词表
-        :param n:插入词的数量
-        :return:插入词语后的语句
-        随机插入
-        随机在语句中插入n个词
+        :param words: sentence样本
+        :param n: 插入词的数量
+        :return: 插入词语后的语句
+         随机在语句中插入n个词
         """
         new_words = words.copy()
         for _ in range(n):
@@ -73,7 +86,11 @@ class EDA(object):
         return new_words
 
     def add_word(self, new_words):
-        """添加词汇"""
+        """
+        :param new_words: sentence样本
+        :return: 添加词汇后的文本
+         在随机位置添加一个随机词汇
+        """
         synonyms = []
         counter = 0
         while len(synonyms) < 1:
@@ -88,11 +105,11 @@ class EDA(object):
 
     def random_swap(self, words, n):
         """
-        :param words:词表
-        :param n:随机交换词汇的次数
-        :return:交换n次后的语句
-        Random swap
-        Randomly swap two words in the sentence n times
+        :param words: sentence样本
+        :param n: 随机交换词汇的次数
+        :return: 交换n次后的语句
+         Random swap
+         Randomly swap two words in the sentence n times
         """
         new_words = words.copy()
         for _ in range(n):
@@ -100,6 +117,11 @@ class EDA(object):
         return new_words
 
     def swap_word(self, new_words):
+        """
+        :param new_words: sentence样本
+        :return: 交换后的sentence
+         随机交换两个词语
+        """
         random_idx_1 = random.randint(0, len(new_words) - 1)
         random_idx_2 = random_idx_1
         counter = 0
@@ -113,10 +135,10 @@ class EDA(object):
 
     def random_deletion(self, words, p):
         """
-        :param words:词表
-        :param p:概率
-        :return:概率删除后的语句
-        以概率p删除语句中的词
+        :param words: 词表
+        :param p: 概率
+        :return: 概率删除后的语句
+         以概率p删除语句中的词
         """
         if len(words) == 1:
             return words
@@ -135,13 +157,13 @@ class EDA(object):
 
     def run(self, sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9):
         """
-        :param sentence:段落
-        :param alpha_sr:同义词替换率
-        :param alpha_ri: 随机插入率
-        :param alpha_rs: 随机交换率
-        :param p_rd:概率
-        :param num_aug:num_aug
-        :return:增强后的数据
+        :param sentence: sentence样本
+        :param alpha_sr: 同义词替换比率
+        :param alpha_ri: 随机插入比率
+        :param alpha_rs: 随机交换比率
+        :param p_rd: 随机删除概率
+        :param num_aug: num_aug
+        :return: 增强后的数据
         """
         seg_list = jieba.cut(sentence)
         seg_list = " ".join(seg_list)
