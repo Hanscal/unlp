@@ -83,3 +83,5 @@
        eda.rst                      --> 写入后会在html目录中生成层级索引
        translate.rst                --> code具体内容会自动读取
        data_augmentation.rst        
+
+步骤5--在docs/build/html/index.html 中查看自动生成的说明文档
