@@ -1,6 +1,6 @@
 # 自动文档生成
 
-# .py文件中的注释格式
+## .py文件中的注释格式
 
     def function([paramter,……]):  
     
@@ -29,7 +29,7 @@
         print('str')
         print()
 
-# sphinx操作流程
+## sphinx操作流程
 
 **1.安装sphinx及相关配置文件**
 
