@@ -15,14 +15,15 @@ import random
 import json
 import time
 
+
 class Translator(object):
     def translate(self, q, src_lang, tgt_lang):
         """
-        :param q:翻译前文本
+        :param q: 翻译前文本
         :param src_lang: 原始语言
         :param tgt_lang: 目标语言
         :return: 翻译后的文本
-        请求百度通用翻译API，详细请看 https://api.fanyi.baidu.com/doc/21
+         请求百度通用翻译API，详细请看 https://api.fanyi.baidu.com/doc/21
         """
         appid = '20220302001105912'  # Fill in your AppID
         secretKey = 'Gpginf0ryq4tRXBEgGyD'  # Fill in your key
