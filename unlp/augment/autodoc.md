@@ -26,7 +26,7 @@
         :return: None
          打印输入的字符串并换行
         """  
-        print('str')
+        print(str)
         print()
 
 ## sphinx操作流程
