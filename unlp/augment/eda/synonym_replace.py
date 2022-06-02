@@ -7,12 +7,18 @@
 """
 
 import os
+import random
+
 import numpy as np
 import jieba
 import jieba.analyse
 from gensim.models import KeyedVectors
 from gensim import matutils
-
+import synonyms
+from nltk.corpus import wordnet
+import nltk
+nltk.download('omw')
+nltk.download('wordnet')
 
 def read_samples(file_path):
     samples = []
@@ -53,7 +59,7 @@ class EmbedReplace(object):
 
         return keys
 
-    def replace_words(self, sample, keywords, ratio=0.2):
+    def replace_words(self, sample, keywords, ratio=0.3):
         """用wordvector的近义词来替换，并避开关键词
         :param sample (list): reference token list
         :param keywords (list): A reference represented by a word bag model
@@ -65,9 +71,17 @@ class EmbedReplace(object):
         indexes = np.random.choice(len(sample), num)
         for index in indexes:
             token = sample[index]
-            if self.is_chinese(token) and token not in keywords and token in self.wv:
-                new_tokens[index] = self.wv.most_similar(positive=token, negative=None, topn=1)[0][0]
-
+            word = []
+            if self.is_chinese(token):
+                word = synonyms.nearby(token)[0][:3] if synonyms.nearby(token) else []
+                # print(word)
+                for each in wordnet.synsets(token, lang='cmn'):
+                    word.extend(each.lemma_names('cmn'))
+                word = list(set(word))
+                print(word)
+            elif not word and self.is_chinese(token) and token in self.wv:
+                word = [self.wv.most_similar(positive=token, negative=None, topn=1)[0][0]]
+            new_tokens[index] = random.choice(word) if word else token
         return new_tokens
 
     def run_replace(self, sample):
@@ -81,5 +95,7 @@ if __name__ == '__main__':
     samples = read_samples(os.path.join(data_dir, 'corpus.txt'))
     wv_path = '/Volumes/work/project/unlp//unlp/transformers/word2vec/light_Tencent_AILab_ChineseEmbedding.bin'
     replacer = EmbedReplace(wv_path)
-    res = replacer.run_replace(samples)
-    print(res)
+    for sample in random.sample(samples,5):
+        print('before',sample)
+        res = replacer.run_replace(sample)
+        print('after',res)

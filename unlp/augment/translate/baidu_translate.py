@@ -51,23 +51,29 @@ class Translator(object):
             if httpClient:
                 httpClient.close()
 
-    def back_translate(self, text, src_lang="zh", tgt_lang="en"):
+    def back_translate(self, text, src_lang="zh"):
         """
         :param q: 文本
         :param src_lang: 原始语言
         :param tgt_lang: 目前语言
         :return: 回译后的文本
         """
-        en = self.translate(text, src_lang, tgt_lang)['trans_result'][0]['dst']
-        time.sleep(1.5)
-        target = self.translate(en, tgt_lang, src_lang)['trans_result'][0]['dst']
-        time.sleep(1.5)
-
-        return en, target
+        lan_list = "en,jp,kor,fra,spa,th,ara,ru,pt,de,it,el,nl,pl,bul,est,dan,fin,cs,rom,slo,swe,hu,cht,vie".split(",")
+        res = []
+        for tgt_lang in lan_list:
+            time.sleep(1.5)
+            trans_result = self.translate(text, src_lang, tgt_lang).get('trans_result',[])
+            en = trans_result[0]['dst'] if trans_result else ''
+            if en:
+                time.sleep(1.5)
+                trans_result_en = self.translate(en, tgt_lang, src_lang).get('trans_result',[])
+                target = trans_result_en[0]['dst'] if trans_result_en else ''
+                if target:
+                    res.append(target)
+        return list(set(res))
 
 
 if __name__ == '__main__':
     t = Translator()
-    en, tgt = t.back_translate('你好呀', src_lang='zh', tgt_lang='en')
-    print("English", en)
-    print("Chinese", tgt)
+    res = t.back_translate('帮我查一下航班信息', src_lang='zh')
+    print("back_translate", res)
