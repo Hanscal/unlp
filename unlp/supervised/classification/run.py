@@ -60,11 +60,11 @@ class Service(object):
             self.config.n_vocab = len(self.vocab)
             self.model = self.x.Model(self.config).to(self.config.device)
             resume_model_path = kwargs.get('model_path', '')
-            if os.path.isdir(resume_model_path) and kwargs.get('resume',''):
+            if os.path.isdir(resume_model_path):
                 resume_model_path = os.path.join(resume_model_path, WEIGHTS_NAME)
                 print("resume model from {}".format(resume_model_path))
                 self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
-            elif os.path.isfile(resume_model_path) and kwargs.get('resume',''):
+            elif os.path.isfile(resume_model_path):
                 print("resume model from {}".format(resume_model_path))
                 self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
 

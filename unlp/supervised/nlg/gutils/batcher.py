@@ -3,7 +3,6 @@ import time
 import random
 import torch
 import numpy as np
-import tensorflow as tf
 from random import shuffle
 from queue import Queue
 from threading import Thread
@@ -14,7 +13,7 @@ import sys
 sys.path.append(os.path.dirname(__file__))
 
 import data
-from config import get_argparse
+from .config import get_argparse
 
 random.seed(1234)
 
@@ -22,7 +21,7 @@ random.seed(1234)
 
 class Example(object):
     def __init__(self, article, abstract_sentences, vocab, **kwargs):
-        config = get_argparse().parse_args()
+        config = get_argparse()
         # 利用kwargs来更新args
         args_bak = vars(config)
         for k, v in kwargs.items():
@@ -282,21 +281,16 @@ class Batcher(object):
 
     def watch_threads(self):
         while True:
-            tf.logging.info(
-            'Bucket queue size: %i, Input queue size: %i',
-            self._batch_queue.qsize(), self._example_queue.qsize())
 
             time.sleep(60)
             for idx,t in enumerate(self._example_q_threads):
                 if not t.is_alive(): # if the thread is dead
-                    tf.logging.error('Found example queue thread dead. Restarting.')
                     new_t = Thread(target=self.fill_example_queue)
                     self._example_q_threads[idx] = new_t
                     new_t.daemon = True
                     new_t.start()
             for idx,t in enumerate(self._batch_q_threads):
                 if not t.is_alive(): # if the thread is dead
-                    tf.logging.error('Found batch queue thread dead. Restarting.')
                     new_t = Thread(target=self.fill_batch_queue)
                     self._batch_q_threads[idx] = new_t
                     new_t.daemon = True

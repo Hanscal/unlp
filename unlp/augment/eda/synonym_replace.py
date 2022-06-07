@@ -52,6 +52,7 @@ class EmbedReplace(object):
 
     def extract_keywords(self, text, topk=5):
         """ 提取关键词
+        :param text:
         :param topk: 前 topk 个关键词
         :return: 返回的关键词列表
         """

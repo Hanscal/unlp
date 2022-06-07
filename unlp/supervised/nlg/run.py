@@ -15,9 +15,9 @@ from typing import List
 file_root = os.path.dirname(__file__)
 sys.path.append(file_root)
 
-from train import Train
-from eval import Evaluate
-from predict import Predictor
+from .train import Train
+from .eval import Evaluate
+from .predict import Predictor
 
 class Service(object):
     def __init__(self, model_name, mode, **kwargs):

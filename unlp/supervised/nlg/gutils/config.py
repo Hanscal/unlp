@@ -48,7 +48,7 @@ def get_argparse():
     args = parser.parse_args()
     return args
 
-def set_gpt_args(**kwargs):
+def get_gpt_args(**kwargs):
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_type", default='dialog-gpt', type=str, help="The model type supported")
     parser.add_argument('--data_dir', default='../data/chnchat', type=str, required=False, help='训练集路径')
