@@ -145,8 +145,8 @@ class BartAugmentor(object):
 if __name__ == "__main__":
     # bert 模型下载地址，中文bert下载链接：https://github.com/InsaneLife/ChineseNLPCorpus#%E9%A2%84%E8%AE%AD%E7%BB%83%E8%AF%8D%E5%90%91%E9%87%8For%E6%A8%A1%E5%9E%8B
     s = '帮我查一下航班信息'
-    bart_base_path = "/Volumes/work/project/unlp/unlp/transformers/bart-base-chinese"
-    bert_base_path = "/Volumes/work/project/unlp/unlp/transformers/bert-base-chinese"
+    bart_base_path = "/data/lss/deepenv/deepenv-data/unlp包/transformer/bart-base-chinese"
+    bert_base_path = "/data/lss/deepenv/deepenv-data/unlp包/transformer/bert-base-chinese"
     model = BartAugmentor(model_dir=bart_base_path)
     res = model.augment(s)
 

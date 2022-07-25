@@ -6,5 +6,4 @@
 @Email   : hua.cai@unidt.com
 """
 
-from unlp.augment.eda import eda
-from unlp.augment.translate import baidu_translate
+from unlp.augment import data_augmentation

@@ -20,12 +20,6 @@
         - 使用了synonyms工具查找同义词
     - 2.word2vec、词典同义词替换
         - 使用gensim的词向量，找出某个词最相似的词作为同义词。
-
-# LM生成：
-    - 1. 原始query的token，不过会做一些随机mask，来预测mask掉的词语。
-    - 2. 分类的类别标签，保证语义不变性。
-
-分类的类别标签，保证语义不变性。
    
 # 使用方法
 **对于短文本，回译效果比较好。对于长文本，同义词EDA效果比较好。**  
@@ -34,17 +28,7 @@
 
 ### 同义词替换  
 
-### LM生成方法  
-
-
-**[其他方法]**  
-* nlpcda(https://github.com/425776024/nlpcda)  
-* TextAttack(https://github.com/QData/TextAttack)   
-* nlpaug(https://github.com/makcedward/nlpaug)
-
+**[其他方法](https://github.com/425776024/nlpcda)**
  
 # 相关论文  
 [1] 《Easy data augmentation techniques for boosting performance on text classification tasks》
-[2] 《Contextual Augmentation:Data Augmentation by Words with Paradigmatic Relations》
-[3] 《Conditional BERT Contextual Augmentation》
-[4] 《TextAttack: A Framework for Adversarial Attacks, Data Augmentation, and Adversarial Training in NLP》

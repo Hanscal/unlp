@@ -8,6 +8,7 @@
 import os
 import sys
 import jieba
+from sklearn.linear_model import ElasticNet
 import synonyms
 import random
 from random import shuffle
@@ -25,10 +26,12 @@ class EDA(object):
         self.stop_words = list()
         for stop_word in f.readlines():
             self.stop_words.append(stop_word.strip())
-        wv_path = kwargs.get('wv_path', '')
+        wv_path = kwargs.get('model_path', '')
         self.synonym_replacer = None
         if os.path.exists(wv_path):
             self.synonym_replacer = EmbedReplace(wv_path)
+        else:
+            print("w2v路径错误")
 
     ########################################################################
     # 同义词替换
@@ -45,12 +48,14 @@ class EDA(object):
                 synonym = random.choice(synonyms)
                 new_words = [synonym if word == random_word else word for word in new_words]
                 num_replaced += 1
-            if num_replaced >= n:
+            if num_replaced > n:
                 break
 
-        sentence = ' '.join(new_words)
-        new_words = sentence.split(' ')
-
+        # 2022.06.20 dqq修改1
+        # 以下两行代码无意义，可选择删除
+        # sentence = ' '.join(new_words)
+        # new_words = sentence.split(' ')
+        
         return new_words
 
 
@@ -91,21 +96,25 @@ class EDA(object):
     def random_swap(self, words, n):
         new_words = words.copy()
         for _ in range(n):
-            new_words = self.swap_word(new_words)
+            random_idx_1, random_idx_2 = random.sample(range(0,len(new_words)),2)
+            new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1]
+            # new_words = self.swap_word(new_words)
         return new_words
 
+    # 2022.06.20 dqq修改2
+    # 选取两个不同的索引，过程冗余，swap_word()，以下代码可删除
 
-    def swap_word(self, new_words):
-        random_idx_1 = random.randint(0, len(new_words) - 1)
-        random_idx_2 = random_idx_1
-        counter = 0
-        while random_idx_2 == random_idx_1:
-            random_idx_2 = random.randint(0, len(new_words) - 1)
-            counter += 1
-            if counter > 3:
-                return new_words
-        new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1]
-        return new_words
+    # def swap_word(self, new_words):
+        # random_idx_1 = random.randint(0, len(new_words) - 1)
+        # random_idx_2 = random_idx_1
+        # counter = 0
+        # while random_idx_2 == random_idx_1:
+            # random_idx_2 = random.randint(0, len(new_words) - 1)
+            # counter += 1
+            # if counter > 3:
+                # return new_words
+        # new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1]
+        # return new_words
 
 
     ########################################################################
@@ -131,7 +140,7 @@ class EDA(object):
 
     ########################################################################
     # EDA函数
-    def run(self, sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9):
+    def augment(self, sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9):
         seg_list = jieba.cut(sentence)
         seg_list = " ".join(seg_list)
         words = list(seg_list.split())
@@ -148,28 +157,31 @@ class EDA(object):
         # 同义词替换sr
         for _ in range(num_new_per_technique):
             a_words = self.synonym_replacement(words, n_sr)
-            augmented_sentences.append(' '.join(a_words))
+            # 2022.06.20 dqq修改
+            # augmented_sentences.append(' '.join(a_words))
+            # 以下同此
+            augmented_sentences.append(''.join(a_words))
 
         # 词向量同义词替换er
         if self.synonym_replacer is not None:
             for _ in range(num_new_per_technique*2): # 如果用了这个方法，则产生两倍的数量
                 a_words = self.synonym_replacer.run_replace(sentence)
-                augmented_sentences.append(' '.join(a_words))
+                augmented_sentences.append(''.join(a_words))
 
         # 随机插入ri
         for _ in range(num_new_per_technique):
             a_words = self.random_insertion(words, n_ri)
-            augmented_sentences.append(' '.join(a_words))
+            augmented_sentences.append(''.join(a_words))
 
         # 随机交换rs
         for _ in range(num_new_per_technique):
             a_words = self.random_swap(words, n_rs)
-            augmented_sentences.append(' '.join(a_words))
+            augmented_sentences.append(''.join(a_words))
 
         # 随机删除rd
         for _ in range(num_new_per_technique):
             a_words = self.random_deletion(words, p_rd)
-            augmented_sentences.append(' '.join(a_words))
+            augmented_sentences.append(''.join(a_words))
 
         # print(augmented_sentences)
         shuffle(augmented_sentences)
@@ -180,12 +192,14 @@ class EDA(object):
             keep_prob = num_aug / len(augmented_sentences)
             augmented_sentences = [s for s in augmented_sentences if random.uniform(0, 1) < keep_prob]
 
-        augmented_sentences.append(seg_list)
+        # 2022.06.20 dqq修改
+        # seg_list为原始文本,无需再添加，以下代码可删除
+        # augmented_sentences.append(seg_list)
 
         return augmented_sentences
 
 if __name__ == '__main__':
-    kwargs = {"wv_path":'/Volumes/work/project/unlp//unlp/transformers/word2vec/light_Tencent_AILab_ChineseEmbedding.bin'}
-    eda = EDA(**kwargs)
-    res = eda.run(sentence="我们就像蒲公英，我也祈祷着能和你飞去同一片土地", num_aug=4)
+    kwargs = {"model_path":'/data/lss/deepenv/deepenv-data/unlp包/transformer/word2vec/light_Tencent_AILab_ChineseEmbedding.bin'}
+    eda = EDA(model_path='/data/lss/deepenv/deepenv-data/unlp包/transformer/word2vec/light_Tencent_AILab_ChineseEmbedding.bin')
+    res = eda.augment(sentence="我们就像蒲公英，我也祈祷着能和你飞去同一片土地", num_aug=29)
     print(len(res), res)
