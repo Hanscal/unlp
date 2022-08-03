@@ -91,7 +91,7 @@ class Service(object):
                 args_bak[k] = v
 
         eval_dataset = load_and_cache_examples(args, 'cluener', self.tokenizer, data_type='dev')
-        args.n_gpu = torch.cuda.device_count()
+        args.n_gpu = 1#torch.cuda.device_count()
         args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
         eval_sampler = SequentialSampler(eval_dataset)
         eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size, collate_fn=collate_fn)
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     # res = service.run_evaluate()
 
     # predict-BERT
-    service = Service(model_name="bert-base-chinese", mode='predict', **{"data_dir": '/Volumes/work/project/unlp/unlp/supervised/ner/data/cluner',
-                                                            "model_path":"/Volumes/work/project/unlp/unlp/supervised/ner/data/cluner/saved_dict/bert-base-chinese"})
+    service = Service(model_name="bert-base-chinese", mode='predict', **{"data_dir": '/data/lss/deepenv/deepenv-data/unlp_debug/unlp/supervised/ner/data/cluner',
+                                                            "model_path":"/data/lss/deepenv/deepenv-data/unlp_debug/unlp/supervised/ner/data/cluner/saved_dict/bert-base-chinese"})
     res = service.run_predict(text=['在豪门被多线作战拖累时，正是他们悄悄追赶上来的大好时机。重新找回全队的凝聚力是拉科赢球的资本。',"不久后，“星展中国”南宁分行也将择机开业。除新加坡星展银行外，多家外资银行最近纷纷扩大在华投资，"])
     print(res)

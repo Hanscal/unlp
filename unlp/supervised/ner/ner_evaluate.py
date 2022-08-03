@@ -34,11 +34,11 @@ class NEREvaluator(object):
         for k, v in kwargs.items():
             if k in args_bak:
                 args_bak[k] = v
-        print(args)
 
         # Setup CUDA, GPU
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        args.n_gpu = torch.cuda.device_count()
+        #修改，单卡
+        args.n_gpu = 1#torch.cuda.device_count()
         args.device = device
 
         # Set seed
@@ -65,6 +65,7 @@ class NEREvaluator(object):
         pbar = ProgressBar(n_total=len(eval_dataloader), desc="Evaluating")
         if isinstance(model, nn.DataParallel):
             model = model.module
+        model.to(self.args.device)
         model.eval()
 
         for step, batch in enumerate(eval_dataloader):

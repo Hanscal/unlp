@@ -12,13 +12,24 @@ import torch.nn.functional as F
 from sklearn import metrics
 import time
 
+#改动
+import os
+#torch.load地址加权重
+WEIGHTS_NAME = 'pytorch_model.bin'
+
+
 class Evaluate(object):
     def __init__(self):
         pass
 
     def test(self, config, model, test_iter):
-        # test
-        model.load_state_dict(torch.load(config.save_path))
+        #修改
+        if os.path.isdir(config.save_path):
+            model.load_state_dict(torch.load(os.path.join(config.save_path, WEIGHTS_NAME)))
+        else:
+            model.load_state_dict(torch.load(config.save_path))
+        
+        
         model.eval()
         start_time = time.time()
         test_acc, test_loss, test_report, test_confusion = self.evaluate(config, model, test_iter, test=True)
@@ -29,7 +40,9 @@ class Evaluate(object):
         print("Confusion Matrix...")
         print(test_confusion)
         print("Time usage:", time.time() - start_time)
-
+        
+        #增加return
+        return test_acc, test_loss, test_report, test_confusion
 
     def evaluate(self, config, model, data_iter, test=False):
         model.eval()
@@ -47,6 +60,7 @@ class Evaluate(object):
                 predict_all = np.append(predict_all, predic)
 
         acc = metrics.accuracy_score(labels_all, predict_all)
+        
         if test:
             report = metrics.classification_report(labels_all, predict_all, target_names=config.class_list, digits=4)
             confusion = metrics.confusion_matrix(labels_all, predict_all)

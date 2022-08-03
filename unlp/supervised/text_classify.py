@@ -39,7 +39,7 @@ class Classification(object):
 
 if __name__ == '__main__':
     # 预训练时可以通过resume (bool类型）控制是否继续训练，其他predict和evaluate阶段可以不传入这个参数
-    classify = Classification("BERT", mode='train', use_word=False, **{"embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-                                                                          "model_path":"/Volumes/work/project/unlp/unlp/transformers/bert-base-chinese"})
+    classify = Classification("DPCNN", mode='train', use_word=False, **{"embedding":"random", "dataset": '/data/lss/deepenv/deepenv-data/unlp包/unlp/unlp/supervised/classification/data/THUCNews','resume':True,
+                                                                          "model_path":"/data/lss/deepenv/deepenv-data/unlp包/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/DPCNN.ckpt"})
     res = classify.run(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势","中华女子学院：本科层次仅1专业招男生"])
     print(res)

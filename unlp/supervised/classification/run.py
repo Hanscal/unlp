@@ -40,7 +40,10 @@ class Service(object):
         # 'TextRCNN'  # TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer
         if self.model_name == 'FastText':
             from sutils.dutils import build_fasttext_dataset as build_dataset
-            from sutils.dutils import build_iterator
+            #修改
+#             from sutils.dutils import build_iterator
+            from sutils.dutils import build_fasttext_iterator as build_iterator
+
             self.embedding = 'random'
         elif self.model_name in ['BERT', "ERNIE"]:
             from sutils.dutils import build_tranformer_dataset as build_dataset
@@ -60,7 +63,7 @@ class Service(object):
             self.config.n_vocab = len(self.vocab)
             self.model = self.x.Model(self.config).to(self.config.device)
             resume_model_path = kwargs.get('model_path', '')
-            if os.path.isdir(resume_model_path):
+            if os.path.isdir(resume_model_path) and kwargs.get('resume',''):
                 resume_model_path = os.path.join(resume_model_path, WEIGHTS_NAME)
                 print("resume model from {}".format(resume_model_path))
                 self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
@@ -85,6 +88,7 @@ class Service(object):
                 self.vocab = json.load(open(vocab_path))
                 self.config.n_vocab = len(self.vocab)
             except:
+                print(self.config)
                 print('no vocab path in config, model name:{}'.format(self.config.model_name))
             model_path = kwargs['model_path']
             self.model = self.x.Model(self.config).to(self.config.device)
@@ -93,7 +97,7 @@ class Service(object):
             print("loading model from {}".format(model_path))
             self.model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 
-    def run_train(self): # 或者是pre_trained的路径
+    def run_train(self): # 或者是pre_trained的路径        
         if self.model_name not in ['BERT', 'ERNIE']:
             init_network(self.model)
             self.trainer = Train()
@@ -112,8 +116,11 @@ class Service(object):
         test_iter = self.build_iterator(test_data, self.config)
 
         self.evaluator = Evaluate()
+        #下一句报错 TypeError: 'NoneType' object is not iterable
+        #evaluate.py Evaluate.test 增加返回acc, loss, report, confusion
         acc, loss, report, confusion = self.evaluator.test(self.config, self.model, test_iter)
         return acc, loss, report, confusion
+
 
 
     def run_predict(self, text: List[str]):
@@ -139,8 +146,8 @@ if __name__ == '__main__':
     #                                                       "resume":False})
     # res = service.run_train()
     # predict-BERT
-    service = Service(model_name="BERT", mode='predict', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-                                                            "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT",
+    service = Service(model_name="DPCNN", mode='train', **{"use_word":True, "embedding":"random", "dataset": '/data/lss/deepenv/deepenv-data/unlp包/unlp/unlp/supervised/classification/data/THUCNews',
+                                                            "model_path":"/data/lss/deepenv/deepenv-data/unlp包/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/DPCNN.ckpt",
                                                             "resume":True})
-    res = service.run_predict(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势"])
+    res = service.run_train()
     print(res)

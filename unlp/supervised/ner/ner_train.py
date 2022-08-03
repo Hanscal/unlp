@@ -92,7 +92,7 @@ class NERTrainer(object):
 
         # Setup CUDA, GPU
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        args_bak['n_gpu'] = 1
+        args_bak['n_gpu'] = 1#torch.cuda.device_count()
         args_bak['device'] = device
 
         # Set seed
@@ -261,8 +261,8 @@ class NERTrainer(object):
 
 
 if __name__ == "__main__":
-    kwargs = {"data_dir":"/Volumes/work/project/unlp/unlp/supervised/ner/data/cluner", "model_type":"chinese-bert-wwm-ext",
-              "model_name_or_path":"/Volumes/work/project/unlp/unlp/transformers/chinese-bert-wwm-ext"}
+    kwargs = {"data_dir":"/Volumes/work/project/unlp/unlp/supervised/ner/data/cluner", "model_type":"bert-base-chinese",
+              "model_name_or_path":"/Volumes/work/project/unlp/unlp/transformers/bert-base-chinese"}
     train = NERTrainer(**kwargs)
     res = train.train()
     print(res)

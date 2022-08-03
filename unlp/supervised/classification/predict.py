@@ -14,8 +14,8 @@ from tqdm import tqdm
 
 file_root = os.path.dirname(__file__)
 sys.path.append(file_root)
-
-from sutils.dutils import TransfomerDatasetIterater, DatasetIterater
+#修改,增加fasttext预处理
+from sutils.dutils import TransfomerDatasetIterater, DatasetIterater, FasttextDatasetIterater
 from sutils.dutils import char_tokenizer, word_tokenizer
 
 UNK, PAD = '<UNK>', '<PAD>'  # 未知字，padding符号
@@ -27,6 +27,12 @@ class Predict(object):
         if config.model_name in ['BERT', 'ERNIE']:
             self.tokenizer = config.tokenizer
             self.build_iterator = self.load_transformer_dataset
+        #修改,增加fasttext预处理
+        elif config.model_name == 'FastText':
+            self.tokenizer = word_tokenizer
+            self.build_iterator = self.load_fasttext_dataset
+            self.vocab = json.load(open(config.vocab_path, 'r'))
+        #修改完毕
         elif use_word:
             self.tokenizer = word_tokenizer
             self.vocab = json.load(open(config.vocab_path, 'r'))
@@ -92,3 +98,43 @@ class Predict(object):
             contents.append((token_ids, 0, seq_len, mask))  # 这里的label值无所谓
         content_iter = TransfomerDatasetIterater(contents, self.config.batch_size, self.config.device)
         return content_iter
+    
+    #修改,增加fasttext预处理
+    def biGramHash(self, sequence, t, buckets):
+        t1 = sequence[t - 1] if t - 1 >= 0 else 0
+        return (t1 * 14918087) % buckets
+
+    def triGramHash(self, sequence, t, buckets):
+        t1 = sequence[t - 1] if t - 1 >= 0 else 0
+        t2 = sequence[t - 2] if t - 2 >= 0 else 0
+        return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
+
+    def load_fasttext_dataset(self, texts, pad_size=32):
+        contents = []
+        for content in tqdm(texts):
+            words_line = []
+            token = self.tokenizer(content)
+            seq_len = len(token)
+            if pad_size:
+                if len(token) < pad_size:
+                    token.extend([PAD] * (pad_size - len(token)))
+                else:
+                    token = token[:pad_size]
+                    seq_len = pad_size
+            # word to id
+            for word in token:
+                words_line.append(self.vocab.get(word, self.vocab.get(UNK)))
+
+            # fasttext ngram
+            buckets = self.config.n_gram_vocab
+            bigram = []
+            trigram = []
+            # ------ngram------
+            for i in range(pad_size):
+                bigram.append(self.biGramHash(words_line, i, buckets))
+                trigram.append(self.triGramHash(words_line, i, buckets))
+            # -----------------
+            contents.append((words_line, 0, seq_len, bigram, trigram))
+        content_iter = FasttextDatasetIterater(contents, self.config.batch_size, self.config.device)
+        return content_iter
+    #修改完毕
