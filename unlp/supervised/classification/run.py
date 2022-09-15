@@ -31,9 +31,10 @@ class Service(object):
         torch.cuda.manual_seed_all(1)
         torch.backends.cudnn.deterministic = True  # 保证每次结果一样
         self.model_name = model_name
-
+        self.kwargs = kwargs
+        # todo 安装包时import_module需要从根目录导入，
         if self.model_name in ['BERT', 'ERNIE']:
-            self.x = import_module('unlp.supervised.classification.models.transformer.' + self.model_name)
+            self.x = import_module('models.transformer.' + self.model_name)
         else:
             self.x = import_module('unlp.supervised.classification.models.' + self.model_name)
 
@@ -59,14 +60,6 @@ class Service(object):
             self.vocab = load_vocab(self.config, self.use_word)
             self.config.n_vocab = len(self.vocab)
             self.model = self.x.Model(self.config).to(self.config.device)
-            resume_model_path = kwargs.get('model_path', '')
-            if os.path.isdir(resume_model_path):
-                resume_model_path = os.path.join(resume_model_path, WEIGHTS_NAME)
-                print("resume model from {}".format(resume_model_path))
-                self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
-            elif os.path.isfile(resume_model_path):
-                print("resume model from {}".format(resume_model_path))
-                self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
 
         elif mode == 'evaluate':
             self.config = self.x.Config(dataset, embedding, **kwargs)
@@ -99,6 +92,15 @@ class Service(object):
             self.trainer = Train()
         else:
             self.trainer = TrainTransfomer()
+
+        resume_model_path = self.kwargs.get('model_path', '')
+        if os.path.isdir(resume_model_path):
+            resume_model_path = os.path.join(resume_model_path, WEIGHTS_NAME)
+            print("resume model from {}".format(resume_model_path))
+            self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
+        elif os.path.isfile(resume_model_path):
+            print("resume model from {}".format(resume_model_path))
+            self.model.load_state_dict(torch.load(resume_model_path, map_location=torch.device('cpu')))
 
         train_data, dev_data, test_data = self.build_dataset(self.config, **{"use_word":self.use_word, "vocab":self.vocab})
         train_iter = self.build_iterator(train_data, self.config)
@@ -139,8 +141,8 @@ if __name__ == '__main__':
     #                                                       "resume":False})
     # res = service.run_train()
     # predict-BERT
-    service = Service(model_name="BERT", mode='predict', **{"use_word":True, "embedding":"random", "dataset": '/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews',
-                                                            "model_path":"/Volumes/work/project/unlp/unlp/supervised/classification/data/THUCNews/saved_dict/BERT",
-                                                            "resume":True})
-    res = service.run_predict(text=['艺龙网并购两家旅游网站',"封基上周溃退 未有明显估值优势"])
+    service = Service(model_name="BERT", mode='train', **{"use_word":True, "embedding":"random", "dataset": '/data/caihua/project/CEM/src/models/Ours/ours_chinese/sent_data',
+                                                            "model_path":"chinese-bert-wwm-ext",
+                                                            "resume":False})
+    res = service.run_train()
     print(res)

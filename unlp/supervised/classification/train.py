@@ -17,12 +17,15 @@ from tensorboardX import SummaryWriter
 
 sys.path.append(os.path.dirname(__file__))
 from evaluate import Evaluate
+from robust import MultiFocalLoss
+from robust import FGM
 
 WEIGHTS_NAME = 'pytorch_model.bin'
 
 class Train(object):
     def __init__(self):
         self.eval = Evaluate()
+        self.FocalLoss = MultiFocalLoss()
 
     def train(self, config, model, train_iter, dev_iter, test_iter):
         start_time = time.time()
@@ -42,7 +45,9 @@ class Train(object):
             for i, (trains, labels) in enumerate(train_iter):
                 outputs = model(trains)
                 model.zero_grad()
-                loss = F.cross_entropy(outputs, labels)
+                # loss = F.cross_entropy(outputs, labels)
+                # 改成focal loss
+                loss = self.FocalLoss(outputs, labels, len(config.class_list))
                 loss.backward()
                 optimizer.step()
                 if total_batch % 100 == 0:
@@ -79,7 +84,7 @@ class Train(object):
             if flag:
                 break
         writer.close()
-        self.eval.test(config, model, test_iter)
+        res = self.eval.test(config, model, test_iter)
 
 
 class TrainTransfomer(object):
@@ -87,6 +92,7 @@ class TrainTransfomer(object):
         from models.transformer.bert_optimization import BertAdam
         self.BertAdam = BertAdam
         self.eval = Evaluate()
+        self.FocalLoss = MultiFocalLoss()
 
     def init_network(self, model, method='xavier', exclude='embedding', seed=123):
         for name, w in model.named_parameters():
@@ -108,6 +114,7 @@ class TrainTransfomer(object):
     def train(self, config, model, train_iter, dev_iter, test_iter):
         start_time = time.time()
         model.train()
+        writer = SummaryWriter(log_dir=config.log_path + '/' + time.strftime('%m-%d_%H.%M', time.localtime()))
         param_optimizer = list(model.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
@@ -123,13 +130,26 @@ class TrainTransfomer(object):
         last_improve = 0  # 记录上次验证集loss下降的batch数
         flag = False  # 记录是否很久没有效果提升
         model.train()
+        fgm = FGM(model)
         for epoch in range(config.num_epochs):
             print('Epoch [{}/{}]'.format(epoch + 1, config.num_epochs))
             for i, (trains, labels) in enumerate(train_iter):
                 outputs = model(trains)
                 model.zero_grad()
-                loss = F.cross_entropy(outputs, labels)
+                # loss = F.cross_entropy(outputs, labels)
+                # 改成focal loss
+                loss = self.FocalLoss(outputs, labels, len(config.class_list))
                 loss.backward()
+
+                # 增加对抗训练
+                # 对抗训练
+                fgm.attack()  # 修改embedding
+                # optimizer.zero_grad() # 梯度累加，不累加去掉注释
+                outputs1 = model(trains)
+                loss_sum = self.FocalLoss(outputs1, labels, len(config.class_list))
+                loss_sum.backward()  # 累加对抗训练的梯度
+                fgm.restore()  # 恢复Embedding的参数
+
                 optimizer.step()
                 if total_batch % 100 == 0:
                     # 每多少轮输出在训练集和验证集上的效果
@@ -151,6 +171,10 @@ class TrainTransfomer(object):
                     time_dif = time.time() - start_time
                     msg = 'Iter: {0:>6},  Train Loss: {1:>5.2},  Train Acc: {2:>6.2%},  Val Loss: {3:>5.2},  Val Acc: {4:>6.2%},  Time: {5} {6}'
                     print(msg.format(total_batch, loss.item(), train_acc, dev_loss, dev_acc, time_dif, improve))
+                    writer.add_scalar("loss/train", loss.item(), total_batch)
+                    writer.add_scalar("loss/dev", dev_loss, total_batch)
+                    writer.add_scalar("acc/train", train_acc, total_batch)
+                    writer.add_scalar("acc/dev", dev_acc, total_batch)
                     model.train()
                 total_batch += 1
                 if total_batch - last_improve > config.require_improvement:
@@ -160,4 +184,4 @@ class TrainTransfomer(object):
                     break
             if flag:
                 break
-        self.eval.test(config, model, test_iter)
+        res = self.eval.test(config, model, test_iter)

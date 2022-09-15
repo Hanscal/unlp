@@ -5,20 +5,24 @@
 @Author  : hcai
 @Email   : hua.cai@unidt.com
 """
-
+import os
+import time
 import numpy as np
 import torch
 import torch.nn.functional as F
 from sklearn import metrics
-import time
+from robust import MultiFocalLoss
+
+WEIGHTS_NAME = 'pytorch_model.bin'
 
 class Evaluate(object):
     def __init__(self):
-        pass
+        self.FocalLoss = MultiFocalLoss()
 
     def test(self, config, model, test_iter):
         # test
-        model.load_state_dict(torch.load(config.save_path))
+        save_path = os.path.join(config.save_path, WEIGHTS_NAME)
+        model.load_state_dict(torch.load(save_path))
         model.eval()
         start_time = time.time()
         test_acc, test_loss, test_report, test_confusion = self.evaluate(config, model, test_iter, test=True)
@@ -29,7 +33,7 @@ class Evaluate(object):
         print("Confusion Matrix...")
         print(test_confusion)
         print("Time usage:", time.time() - start_time)
-
+        return test_acc, test_loss, test_report, test_confusion
 
     def evaluate(self, config, model, data_iter, test=False):
         model.eval()
@@ -39,7 +43,9 @@ class Evaluate(object):
         with torch.no_grad():
             for texts, labels in data_iter:
                 outputs = model(texts)
-                loss = F.cross_entropy(outputs, labels)
+                # loss = F.cross_entropy(outputs, labels)
+                # 改成focal loss
+                loss = self.FocalLoss(outputs, labels, len(config.class_list))
                 loss_total += loss
                 labels = labels.data.cpu().numpy()
                 predic = torch.max(outputs.data, 1)[1].cpu().numpy()
