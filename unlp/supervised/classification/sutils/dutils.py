@@ -170,7 +170,11 @@ def build_tranformer_dataset(config, **kwargs): # 为了与其他dataset_load �
                 lin = line.strip()
                 if not lin:
                     continue
-                content, label = lin.split('\t')
+                line_list = lin.split('\t')
+                if len(line_list) < 2:
+                    print(line_list)
+                    continue
+                content, label = ''.join(line_list[:-1]), line_list[-1]
                 token = config.tokenizer.tokenize(content)
                 token = [CLS] + token
                 seq_len = len(token)
